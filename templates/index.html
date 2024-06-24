@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="col-md-6 ">
+    <div class="detail-box">
+        <h1>
+            Rent Car
+        </h1>
+        <p>
+            Hello there! This is the home page of the Backend of the Rent Car platform. Pass authorization and use APIs
+        </p>
+        <div class="btn-box">
+            <a href="{% url 'admin-login' %}" class="btn1">
+                Authorization
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

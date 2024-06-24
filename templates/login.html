@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login_style.css' %}"/>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-md-6 ">
+    <div class="detail-box">
+        <form autocomplete='off' class='form' method="post">
+            {% csrf_token %}
+          <div class='control'>
+            <h1>
+              Log In
+            </h1>
+          </div>
+          <div class='control block-cube block-input'>
+            <input name='username' placeholder='Username' type='text'>
+            <div class='bg-top'>
+              <div class='bg-inner'></div>
+            </div>
+            <div class='bg-right'>
+              <div class='bg-inner'></div>
+            </div>
+            <div class='bg'>
+              <div class='bg-inner'></div>
+            </div>
+          </div>
+          <div class='control block-cube block-input'>
+            <input name='password' placeholder='Password' type='password'>
+            <div class='bg-top'>
+              <div class='bg-inner'></div>
+            </div>
+            <div class='bg-right'>
+              <div class='bg-inner'></div>
+            </div>
+            <div class='bg'>
+              <div class='bg-inner'></div>
+            </div>
+          </div>
+          <button class='btn block-cube block-cube-hover' type='submit'>
+            <div class='bg-top'>
+              <div class='bg-inner'></div>
+            </div>
+            <div class='bg-right'>
+              <div class='bg-inner'></div>
+            </div>
+            <div class='bg'>
+              <div class='bg-inner'></div>
+            </div>
+            <div class='text'>
+              Log In
+            </div>
+          </button>
+        </form>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    </div>
+</div>
+
+
+{% endblock %}

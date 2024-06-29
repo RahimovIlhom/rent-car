@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     # local apps
     'users',
     'home_app',
+    'car_app',
+    'rent_app',
+    'payment',
 ]
 
 REST_FRAMEWORK = {
@@ -153,6 +156,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.Employee'
 
 LOGIN_URL = '/login/'

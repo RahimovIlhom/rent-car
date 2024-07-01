@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
+from rest_framework.exceptions import ValidationError
 
 from car_app.models import Car
 
@@ -25,11 +26,12 @@ class Rental(models.Model):
     passport = models.CharField(max_length=50)
     passport_image_front = models.ImageField(upload_to='rentals/passport/images', null=True, blank=True)
     passport_image_back = models.ImageField(upload_to='rentals/passport/images', null=True, blank=True)
+    receipt_image = models.ImageField(upload_to='rentals/receipt/images', null=True, blank=True)
     rent_type = models.CharField(max_length=20, choices=RENT_TYPES, default='daily')
     rent_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)])
     rent_period = models.PositiveIntegerField(validators=[MinValueValidator(1)])
-    initial_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0,
-                                         validators=[MinValueValidator(0.0)])
+    initial_payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0,
+                                                 validators=[MinValueValidator(0.0)])
     penalty_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0,
                                              validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
     start_date = models.DateTimeField(auto_now_add=True)
@@ -44,60 +46,78 @@ class Rental(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.start_date = timezone.now()
-        if self.rent_type == 'daily':
-            rent_hour = self.start_date.hour
-            self.end_date = self.start_date + timedelta(days=self.rent_period)
-            self.end_date = self.end_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
-        elif self.rent_type in ['monthly', 'credit']:
-            self.end_date = self.start_date + relativedelta(months=self.rent_period)
+            if self.car.is_active:
+                self.car.status = 'rented'
+                self.car.is_active = False
+                self.car.save()
+            elif not self.car.is_active:
+                raise ValidationError(detail="This car is not active for rent.", code=400)
+
+            if self.rent_type == 'daily':
+                rent_hour = self.start_date.hour
+                self.end_date = self.start_date + timedelta(days=self.rent_period)
+                self.end_date = self.end_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
+            elif self.rent_type in ['monthly', 'credit']:
+                self.end_date = self.start_date + relativedelta(months=self.rent_period)
+
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.fullname}: {self.phone} ({self.car.__str__()})"
 
-    # def total_rental_amount(self):
-    #     if self.rent_type == 'daily':
-    #         time_difference = self.end_date - self.start_date
-    #         all_days = time_difference.days
-    #         return self.rent_amount * all_days
-    #     elif self.rent_type == 'monthly':
-    #         time_difference = self.end_date - self.start_date
-    #         all_months = time_difference.days / 30
-    #         return self.rent_amount * all_months
-    #     elif self.rent_type == 'credit':
-    #         time_difference = self.end_date - self.start_date
-    #         all_months = time_difference.days // 30
-    #         return self.rent_amount * all_months
-    #     else:
-    #         return 0
-    #
-    # def penalty_amount(self):
-    #     if self.rent_type == 'daily':
-    #         if self.closing_date:
-    #             time_difference = self.closing_date - self.end_date
-    #             delayed_hours = time_difference.total_seconds() // 3600
-    #             hourly_penalty = self.rent_amount * self.penalty_percentage / 100
-    #             return hourly_penalty * delayed_hours
-    #         else:
-    #             return 0
-    #     elif self.rent_type == 'monthly':
-    #         if self.closing_date:
-    #             time_difference = self.closing_date - self.end_date
-    #             delayed_days = time_difference.days
-    #             daily_penalty = self.rent_amount * self.penalty_percentage / 100
-    #             return delayed_days * daily_penalty
-    #         else:
-    #             return 0
-    #     else:
-    #         return 0
-    #
-    # def total_price(self):
-    #     return self.total_rental_amount() + self.penalty_amount()
-    #
-    # def total_paid_amount(self):
-    #     payments = self.payments.all()
-    #     total = sum(map(lambda p: p.amount, payments))
-    #     return total + self.initial_amount
-    #
-    # def total_debt_amount(self):
-    #     return self.total_price() - self.total_paid_amount()
+    def total_rental_amount(self):
+        return self.rent_amount * self.rent_period
+
+    def penalty_amount_of_daily_rent(self):
+        if self.rent_type == 'daily':
+            if self.closing_date:
+                time_difference = self.closing_date - self.end_date
+                delayed_hours = time_difference.total_seconds() // 3600
+                hourly_penalty = self.rent_amount * self.penalty_percentage / 100
+                return hourly_penalty * delayed_hours
+            else:
+                return 0
+        else:
+            return 0
+
+    def this_month_paid_amount(self):
+        payments = self.payments.filter(created_at__year=timezone.now().year, created_at__month=timezone.now().month)
+        total = sum(map(lambda p: p.amount, payments))
+        return total
+
+    def this_month_penalty_amount(self):
+        interval_months_count = timezone.now().month - self.start_date.month
+        this_month_payment_date = self.start_date + relativedelta(months=interval_months_count)
+        if this_month_payment_date > timezone.now():
+            return 0
+        delayed_days = (timezone.now() - this_month_payment_date).days
+        daily_penalty = self.rent_amount * self.penalty_percentage / 100
+        penalty_amount = daily_penalty * delayed_days
+        return penalty_amount
+
+    def this_month_debt_amount(self):
+        this_month_paid = self.this_month_paid_amount()
+        this_month_penalty = self.this_month_penalty_amount()
+        total = self.rent_amount - this_month_paid - this_month_penalty
+        return total
+
+    def total_price(self):
+        if self.rent_type == 'daily':
+            return self.total_rental_amount() + self.penalty_amount_of_daily_rent()
+        elif self.rent_type == 'monthly':
+            return self.total_rental_amount() + self.this_month_penalty_amount()
+        else:
+            return self.total_rental_amount()
+
+    def total_paid_amount(self):
+        payments = self.payments.all()
+        total = sum(map(lambda p: p.amount, payments))
+        return total + self.initial_payment_amount
+
+    def total_penalty_amount(self):
+        payments = self.payments.all()
+        total = sum(map(lambda p: p.penalty_amount, payments))
+        return total
+
+    def total_debt_amount(self):
+        return self.total_price() - (self.total_paid_amount() - self.total_penalty_amount())

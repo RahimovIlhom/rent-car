@@ -4,7 +4,7 @@ from car_app import views
 
 urlpatterns = [
     path('create/', views.CarCreateAPIView.as_view()),
-    path('unrepaired/', views.UnRepairedCarsListAPIView.as_view()),
+    path('unrepaired/list/', views.UnRepairedCarsListAPIView.as_view()),
     path('activate/', views.ActivateCarAPIView.as_view()),
     path('deactivate/', views.DeActivateCarAPIView.as_view()),
     path('list/', views.CarListAPIView.as_view()),

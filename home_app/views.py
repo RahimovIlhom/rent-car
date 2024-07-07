@@ -25,7 +25,7 @@ def custom_login(request):
         if user is not None:
             if user.is_superuser:
                 login(request, user)
-                return HttpResponseRedirect('/api/swagger/')
+                return HttpResponseRedirect('/docs/swagger/')
             else:
                 return render(request, 'login.html', {'error': 'Invalid credentials'})
         else:

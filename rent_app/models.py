@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -18,6 +18,11 @@ RENT_TYPES = (
 )
 
 
+class ActiveRentalManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(car__is_active=True)
+
+
 class Rental(models.Model):
     employee = models.ForeignKey(employee_model, on_delete=models.CASCADE, related_name='rentals')
     car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='rentals')
@@ -28,29 +33,30 @@ class Rental(models.Model):
     passport_image_back = models.ImageField(upload_to='rentals/passport/images', null=True, blank=True)
     receipt_image = models.ImageField(upload_to='rentals/receipt/images', null=True, blank=True)
     rent_type = models.CharField(max_length=20, choices=RENT_TYPES, default='daily')
-    rent_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.0)])
+    rent_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.0'))])
     rent_period = models.PositiveIntegerField(validators=[MinValueValidator(1)])
-    initial_payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0,
-                                                 validators=[MinValueValidator(0.0)])
-    penalty_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0,
-                                             validators=[MinValueValidator(0.0), MaxValueValidator(100.0)])
+    initial_payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.0'),
+                                                 validators=[MinValueValidator(Decimal('0.0'))])
+    penalty_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.0'),
+                                             validators=[MinValueValidator(Decimal('0.0')), MaxValueValidator(Decimal('100.0'))])
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=False, blank=True)
     closing_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
+    active_objects = ActiveRentalManager()
+
     class Meta:
         db_table = 'rentals'
-        ordering = ['-start_date']
+        ordering = ['end_date']
 
     def save(self, *args, **kwargs):
         if not self.pk:
             self.start_date = timezone.now()
-            if self.car.is_active:
+            if self.car.status == 'active':
                 self.car.status = 'rented'
-                self.car.is_active = False
                 self.car.save()
-            elif not self.car.is_active:
+            else:
                 raise ValidationError(detail="This car is not active for rent.", code=400)
 
             if self.rent_type == 'daily':
@@ -98,7 +104,10 @@ class Rental(models.Model):
     def this_month_debt_amount(self):
         this_month_paid = self.this_month_paid_amount()
         this_month_penalty = self.this_month_penalty_amount()
-        total = self.rent_amount - this_month_paid - this_month_penalty
+        if self.rent_type == 'monthly':
+            total = self.rent_amount - this_month_paid + this_month_penalty
+        else:
+            total = self.rent_amount - this_month_paid
         return total
 
     def total_price(self):

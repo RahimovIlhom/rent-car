@@ -26,10 +26,12 @@ urlpatterns = [
     path('', include('home_app.urls')),
     path('admin/', admin.site.urls, name='admin'),
     path('login/', views.custom_login, name='login'),
-    path('api/swagger<format>/', login_required(schema_view.without_ui(cache_timeout=0)), name='schema-json'),
-    path('api/swagger/', login_required(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
-    path('api/redoc/', login_required(schema_view.with_ui('redoc', cache_timeout=0)), name='schema-redoc'),
-    path('api/v1/', include('users.urls')),
+    path('docs/swagger<format>/', login_required(schema_view.without_ui(cache_timeout=0)), name='schema-json'),
+    path('docs/swagger/', login_required(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
+    path('docs/redoc/', login_required(schema_view.with_ui('redoc', cache_timeout=0)), name='schema-redoc'),
+    path('api/v1/accounts/', include('users.urls')),
+    path('api/v1/rentals/', include('rent_app.urls')),
+    path('api/v1/cars/', include('car_app.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

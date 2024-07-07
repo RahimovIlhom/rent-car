@@ -3,7 +3,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
-employee = get_user_model()
+employee_model = get_user_model()
 
 FUEL_TYPES = (
     ('petrol', 'Petrol'),
@@ -23,10 +23,16 @@ CAR_STATUS = (
 )
 
 
+class ActiveCarManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
 class Car(models.Model):
+    employee = models.ForeignKey(employee_model, on_delete=models.CASCADE, related_name='cars')
     name = models.CharField(max_length=255)
-    car_number = models.CharField(max_length=255)
-    car_year = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(1800),
+    car_number = models.CharField(max_length=255, unique=True)
+    car_year = models.PositiveIntegerField(null=True, blank=True, validators=[MinValueValidator(1990),
                                                                               MaxValueValidator(2100)])
     information = models.TextField(null=True, blank=True)
     tech_passport_number = models.CharField(max_length=255)
@@ -38,11 +44,15 @@ class Car(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    active_objects = ActiveCarManager()
+    objects = models.Manager()
+
     def __str__(self):
         return f"{self.name} ({self.car_number})"
 
     class Meta:
         db_table = 'cars'
+        ordering = ['-created_at']
 
 
 class CarImage(models.Model):

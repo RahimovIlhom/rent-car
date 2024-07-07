@@ -10,7 +10,7 @@ def home_view(request):
 
 
 def custom_404(request, exception=None):
-    return JsonResponse({'error': 'Not Found'}, status=404)
+    return JsonResponse({'error': 'Sahifa topilmadi'}, status=404)
 
 
 def custom_500(request):

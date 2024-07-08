@@ -15,6 +15,7 @@ from .serializers import UserSerializer, ChangePasswordSerializer
 User = get_user_model()
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class RegisterUserView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -103,8 +104,12 @@ class LoginView(APIView):
             200: openapi.Response('Login successful', openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'refresh': openapi.Schema(type=openapi.TYPE_STRING, description='Refresh token'),
+                    'username': openapi.Schema(type=openapi.TYPE_STRING, description="username"),
+                    'fullname': openapi.Schema(type=openapi.TYPE_STRING, description="fullname"),
+                    'phone': openapi.Schema(type=openapi.TYPE_STRING, description="phone"),
+                    'is_admin': openapi.Schema(type=openapi.TYPE_STRING, description="is_staff"),
                     'access': openapi.Schema(type=openapi.TYPE_STRING, description='Access token'),
+                    'refresh': openapi.Schema(type=openapi.TYPE_STRING, description='Refresh token'),
                 }
             )),
             400: openapi.Response(
@@ -132,12 +137,17 @@ class LoginView(APIView):
         if user is not None:
             refresh = RefreshToken.for_user(user)
             return Response({
+                'username': user.username,
+                'fullname': user.fullname,
+                'phone': user.phone,
+                'is_admin': user.is_staff,
                 'access': str(refresh.access_token),
                 'refresh': str(refresh),
             })
         return Response({"error": "Login yoki parol xato!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -228,6 +238,7 @@ class LogoutView(APIView):
         return super().handle_exception(exc)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -312,6 +323,7 @@ class ChangePasswordView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ResetPasswordView(APIView):
     permission_classes = [IsAdminUser]
 

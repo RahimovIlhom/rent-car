@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +10,7 @@ from car_app.models import Car
 from car_app.serializers import CarCreateSerializer, CarListSerializer, CarDetailSerializer, CarUpdateSerializer
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CarCreateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CarCreateSerializer
@@ -44,6 +47,7 @@ class CarCreateAPIView(APIView):
             return Response(data={'detail': 'Invalid status'}, status=400)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CarDetailAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CarDetailSerializer
@@ -70,6 +74,7 @@ class CarDetailAPIView(APIView):
         return Response(data=serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UnRepairedCarsListAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CarListSerializer
@@ -83,6 +88,7 @@ class UnRepairedCarsListAPIView(APIView):
         return Response(data=serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ActivateCarAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -134,6 +140,7 @@ class ActivateCarAPIView(APIView):
         return Response(data={'detail': 'Avtomobil muvaffaqiyatli faollashtirildi'}, status=200)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DeActivateCarAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -185,6 +192,7 @@ class DeActivateCarAPIView(APIView):
         return Response(data={'detail': 'Avtomobil muvaffaqiyatli faolsizlantirildi'}, status=200)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CarListAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CarListSerializer
@@ -198,6 +206,7 @@ class CarListAPIView(APIView):
         return Response(data=serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ActiveCarListAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CarListSerializer
@@ -211,6 +220,7 @@ class ActiveCarListAPIView(APIView):
         return Response(data=serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CarUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = CarUpdateSerializer
@@ -260,6 +270,7 @@ class CarUpdateAPIView(APIView):
         return Response(data=serializer.data, status=200)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CarDeleteAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

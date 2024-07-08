@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import permissions
@@ -8,6 +10,7 @@ from .models import Rental
 from rent_app.serializers import RentalDashboardSerializer
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class DashboardRentalsView(APIView):
     serializer_class = RentalDashboardSerializer
     permission_classes = [permissions.IsAuthenticated]

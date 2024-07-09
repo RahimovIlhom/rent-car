@@ -32,7 +32,8 @@ class CarCreateAPIView(APIView):
                 'tech_passport_image_back': openapi.Schema(type=openapi.TYPE_FILE,
                                                            description='Back image of tech passport'),
             },
-            required=['name', 'car_number', 'car_year', 'tech_passport_number', 'fuel_type']
+            required=['name', 'car_number', 'car_year', 'tech_passport_number', 'fuel_type'],
+            encoding='multipart/form-data'
         ),
         responses={201: CarCreateSerializer, 400: 'Bad Request'}
     )
@@ -241,7 +242,8 @@ class CarUpdateAPIView(APIView):
                 'tech_passport_image_back': openapi.Schema(type=openapi.TYPE_FILE,
                                                            description='Back image of tech passport'),
             },
-            required=[]
+            required=[],
+            encoding='multipart/form-data'
         ),
         responses={
             200: CarUpdateSerializer,

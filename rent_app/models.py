@@ -25,12 +25,60 @@ class ActiveRentalManager(models.Manager):
 
 class PaymentSchedule(models.Model):
     rental = models.ForeignKey('Rental', on_delete=models.CASCADE, related_name='payment_schedule')
-    due_date = models.DateField()
+    due_date = models.DateTimeField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    penalty_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.0'))
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.0'))
+    paid_date = models.DateTimeField(null=True, blank=True)
+    payment_closing_date = models.DateTimeField(null=True, blank=True)
     is_paid = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Payment of {self.amount} due on {self.due_date} for rental {self.rental}"
+
+    class Meta:
+        ordering = ['due_date']
+
+    def calculate_payment(self):
+        """
+        To'lov miqdorini hisoblaydi, agar jarima qo'llanilishi kerak bo'lsa, uni ham hisoblaydi.
+        """
+        if self.is_paid:
+            return self.amount
+
+        # Jarimani hisoblash
+        current_date = timezone.now()
+        overdue_days = (current_date - self.due_date).days
+        penalty = Decimal('0.0')
+
+        if self.rental.rent_type != 'credit' and overdue_days > 0:
+            penalty_rate = self.rental.penalty_percentage / Decimal('100.0')
+            if self.rental.rent_type == 'monthly':
+                penalty = self.amount * penalty_rate * overdue_days
+            elif self.rental.rent_type == 'daily':
+                penalty = self.amount * penalty_rate * overdue_days
+
+        total_payment = self.amount + penalty
+        self.penalty_amount = penalty
+        self.save()
+        return total_payment
+
+    def make_payment(self, payment_amount):
+        """
+        To'lovni amalga oshirish va tegishli maydonlarni yangilash.
+        """
+        total_payment = self.calculate_payment()
+
+        if payment_amount >= total_payment:
+            self.amount_paid = total_payment
+            self.paid_date = timezone.now()
+            self.payment_closing_date = timezone.now()
+            self.is_paid = True
+        else:
+            self.amount_paid = total_payment
+            self.paid_date = timezone.now()
+
+        self.save()
 
 
 class Rental(models.Model):
@@ -48,7 +96,8 @@ class Rental(models.Model):
     initial_payment_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.0'),
                                                  validators=[MinValueValidator(Decimal('0.0'))])
     penalty_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.0'),
-                                             validators=[MinValueValidator(Decimal('0.0')), MaxValueValidator(Decimal('100.0'))])
+                                             validators=[MinValueValidator(Decimal('0.0')),
+                                                         MaxValueValidator(Decimal('100.0'))])
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=False, blank=True)
     closing_date = models.DateField(null=True, blank=True)
@@ -75,9 +124,14 @@ class Rental(models.Model):
                 self.end_date = self.end_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
             elif self.rent_type in ['monthly', 'credit']:
                 self.end_date = self.start_date + relativedelta(months=self.rent_period)
-                self.create_payment_schedule()
 
         super().save(*args, **kwargs)
+
+        if not PaymentSchedule.objects.filter(rental=self).exists():
+            if self.rent_type == 'daily':
+                self.create_payment_day_schedule()
+            elif self.rent_type in ['monthly', 'credit']:
+                self.create_payment_schedule()
 
     def create_payment_schedule(self):
         current_date = self.start_date
@@ -89,6 +143,13 @@ class Rental(models.Model):
                 amount=self.rent_amount
             )
             current_date = due_date
+
+    def create_payment_day_schedule(self):
+        PaymentSchedule.objects.create(
+            rental=self,
+            due_date=self.end_date,
+            amount=self.rent_amount * self.rent_period
+        )
 
     def __str__(self):
         return f"{self.fullname}: {self.phone} ({self.car.__str__()})"

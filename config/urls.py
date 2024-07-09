@@ -7,7 +7,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from django.contrib.auth.decorators import login_required
-from home_app import views  # Login view uchun import qilish
+from home_app import views
 
 schema_view = get_schema_view(
    openapi.Info(

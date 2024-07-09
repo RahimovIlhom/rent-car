@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'home_app',
     'car_app',
     'rent_app',
-    'payment',
 ]
 
 REST_FRAMEWORK = {
@@ -146,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'uz-uz'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Tashkent'
 

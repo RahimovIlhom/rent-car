@@ -4,22 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="fuel_type update">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="multipart/form-data">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/admin.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/apps.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/migrations/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/models.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/tests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/payment/views.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rent_app/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rent_app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rent_app/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/serializers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +98,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720523149529</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="multipart/form-data">
+      <option name="closed" value="true" />
+      <created>1720533664849</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1720533664849</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -120,6 +114,7 @@
     <MESSAGE value="csrf token remove" />
     <MESSAGE value="csrf token add" />
     <MESSAGE value="fuel_type update" />
-    <option name="LAST_COMMIT_MESSAGE" value="fuel_type update" />
+    <MESSAGE value="multipart/form-data" />
+    <option name="LAST_COMMIT_MESSAGE" value="multipart/form-data" />
   </component>
 </project>

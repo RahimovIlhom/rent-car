@@ -57,6 +57,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ),
     # 'EXCEPTION_HANDLER': 'users.utils.custom_exception_handler',  # Custom exception handlerni qo'shish
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',

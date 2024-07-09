@@ -5,15 +5,15 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 employee_model = get_user_model()
 
-FUEL_TYPES = (
-    ('petrol', 'Petrol'),
-    ('electric', 'Electric'),
-    ('petrol_gas', 'Petrol Gas'),
-    ('methane_gas', 'Methane Gas'),
-    ('propane_gas', 'Propane Gas'),
-    ('diesel', 'Diesel'),
-    ('other', 'Other'),
-)
+# FUEL_TYPES = (
+#     ('petrol', 'Petrol'),
+#     ('electric', 'Electric'),
+#     ('petrol_gas', 'Petrol Gas'),
+#     ('methane_gas', 'Methane Gas'),
+#     ('propane_gas', 'Propane Gas'),
+#     ('diesel', 'Diesel'),
+#     ('other', 'Other'),
+# )
 
 CAR_STATUS = (
     ('active', 'Active'),
@@ -38,7 +38,7 @@ class Car(models.Model):
     tech_passport_number = models.CharField(max_length=255)
     tech_passport_image_front = models.ImageField(upload_to='cars/tech_passport/images', null=True, blank=True)
     tech_passport_image_back = models.ImageField(upload_to='cars/tech_passport/images', null=True, blank=True)
-    fuel_type = models.CharField(max_length=25, choices=FUEL_TYPES, default='petrol')
+    fuel_type = models.CharField(max_length=25, default='petrol')
     status = models.CharField(max_length=25, choices=CAR_STATUS, default='active')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

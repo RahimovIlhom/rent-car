@@ -23,6 +23,16 @@ class ActiveRentalManager(models.Manager):
         return super().get_queryset().filter(car__is_active=True)
 
 
+class PaymentSchedule(models.Model):
+    rental = models.ForeignKey('Rental', on_delete=models.CASCADE, related_name='payment_schedule')
+    due_date = models.DateField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    is_paid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Payment of {self.amount} due on {self.due_date} for rental {self.rental}"
+
+
 class Rental(models.Model):
     employee = models.ForeignKey(employee_model, on_delete=models.CASCADE, related_name='rentals')
     car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='rentals')
@@ -65,68 +75,20 @@ class Rental(models.Model):
                 self.end_date = self.end_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
             elif self.rent_type in ['monthly', 'credit']:
                 self.end_date = self.start_date + relativedelta(months=self.rent_period)
+                self.create_payment_schedule()
 
         super().save(*args, **kwargs)
 
+    def create_payment_schedule(self):
+        current_date = self.start_date
+        for _ in range(self.rent_period):
+            due_date = current_date + relativedelta(months=1)
+            PaymentSchedule.objects.create(
+                rental=self,
+                due_date=due_date,
+                amount=self.rent_amount
+            )
+            current_date = due_date
+
     def __str__(self):
         return f"{self.fullname}: {self.phone} ({self.car.__str__()})"
-
-    def total_rental_amount(self):
-        return self.rent_amount * self.rent_period
-
-    def penalty_amount_of_daily_rent(self):
-        if self.rent_type == 'daily':
-            if self.closing_date:
-                time_difference = self.closing_date - self.end_date
-                delayed_hours = time_difference.total_seconds() // 3600
-                hourly_penalty = self.rent_amount * self.penalty_percentage / 100
-                return hourly_penalty * delayed_hours
-            else:
-                return 0
-        else:
-            return 0
-
-    def this_month_paid_amount(self):
-        payments = self.payments.filter(created_at__year=timezone.now().year, created_at__month=timezone.now().month)
-        total = sum(map(lambda p: p.amount, payments))
-        return total
-
-    def this_month_penalty_amount(self):
-        interval_months_count = timezone.now().month - self.start_date.month
-        this_month_payment_date = self.start_date + relativedelta(months=interval_months_count)
-        if this_month_payment_date > timezone.now():
-            return 0
-        delayed_days = (timezone.now() - this_month_payment_date).days
-        daily_penalty = self.rent_amount * self.penalty_percentage / 100
-        penalty_amount = daily_penalty * delayed_days
-        return penalty_amount
-
-    def this_month_debt_amount(self):
-        this_month_paid = self.this_month_paid_amount()
-        this_month_penalty = self.this_month_penalty_amount()
-        if self.rent_type == 'monthly':
-            total = self.rent_amount - this_month_paid + this_month_penalty
-        else:
-            total = self.rent_amount - this_month_paid
-        return total
-
-    def total_price(self):
-        if self.rent_type == 'daily':
-            return self.total_rental_amount() + self.penalty_amount_of_daily_rent()
-        elif self.rent_type == 'monthly':
-            return self.total_rental_amount() + self.this_month_penalty_amount()
-        else:
-            return self.total_rental_amount()
-
-    def total_paid_amount(self):
-        payments = self.payments.all()
-        total = sum(map(lambda p: p.amount, payments))
-        return total + self.initial_payment_amount
-
-    def total_penalty_amount(self):
-        payments = self.payments.all()
-        total = sum(map(lambda p: p.penalty_amount, payments))
-        return total
-
-    def total_debt_amount(self):
-        return self.total_price() - (self.total_paid_amount() - self.total_penalty_amount())

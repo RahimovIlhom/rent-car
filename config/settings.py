@@ -1,5 +1,6 @@
 from datetime import timedelta
 from pathlib import Path
+
 from environs import Env
 
 env = Env()
@@ -54,6 +55,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.MultiPartRenderer',
+        'rest_framework.renderers.HTMLFormRenderer',
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',

@@ -48,15 +48,17 @@ class PaymentSchedule(models.Model):
 
         # Jarimani hisoblash
         current_date = timezone.now()
-        overdue_days = (current_date - self.due_date).days
+        overdue_time = current_date - self.due_date
         penalty = Decimal('0.0')
 
-        if self.rental.rent_type != 'credit' and overdue_days > 0:
+        if self.rental.rent_type != 'credit' and overdue_time.total_seconds() > 0:
             penalty_rate = self.rental.penalty_percentage / Decimal('100.0')
             if self.rental.rent_type == 'monthly':
+                overdue_days = overdue_time.days
                 penalty = self.amount * penalty_rate * overdue_days
             elif self.rental.rent_type == 'daily':
-                penalty = self.amount * penalty_rate * overdue_days
+                overdue_hours = overdue_time.total_seconds() // 3600
+                penalty = self.amount * penalty_rate * overdue_hours
 
         total_payment = self.amount + penalty
         self.penalty_amount = penalty
@@ -69,16 +71,46 @@ class PaymentSchedule(models.Model):
         """
         total_payment = self.calculate_payment()
 
-        if payment_amount >= total_payment:
-            self.amount_paid = total_payment
+        self.amount_paid += payment_amount
+
+        if self.amount_paid >= total_payment:
+            self.is_paid = True
             self.paid_date = timezone.now()
             self.payment_closing_date = timezone.now()
-            self.is_paid = True
         else:
-            self.amount_paid = total_payment
             self.paid_date = timezone.now()
 
         self.save()
+
+    def get_percentage_amount(self):
+        """
+        To'lov jarimasini hisoblaydi
+        """
+        if self.is_paid:
+            return 0.0
+
+        # Jarimani hisoblash
+        current_date = timezone.now()
+        overdue_time = current_date - self.due_date
+        penalty = Decimal('0.0')
+
+        if self.rental.rent_type != 'credit' and overdue_time.total_seconds() > 0:
+            penalty_rate = self.rental.penalty_percentage / Decimal('100.0')
+            if self.rental.rent_type == 'monthly':
+                overdue_days = overdue_time.days
+                penalty = self.amount * penalty_rate * overdue_days
+            elif self.rental.rent_type == 'daily':
+                overdue_hours = overdue_time.total_seconds() // 3600
+                penalty = self.amount * penalty_rate * overdue_hours
+
+        return penalty
+
+    def get_total_amount(self):
+        """
+        Umumiy to'lov summasi
+        :return:
+        """
+        return self.amount + self.get_percentage_amount()
 
 
 class Rental(models.Model):

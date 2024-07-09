@@ -19,7 +19,7 @@ schema_view = get_schema_view(
       license=openapi.License(name="Hozirda mavjud emas!"),
    ),
    public=True,
-   permission_classes=[permissions.AllowAny,],
+   permission_classes=[permissions.IsAuthenticated,],
 )
 
 urlpatterns = [

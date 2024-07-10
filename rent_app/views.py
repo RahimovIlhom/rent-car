@@ -1,10 +1,12 @@
 from dateutil.relativedelta import relativedelta
+from django.db import transaction
 from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from datetime import date, timedelta
 from rest_framework import generics, permissions, parsers
+from rest_framework.views import APIView
 
 from rent_app.models import PaymentSchedule, Rental
 from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentScheduleListSerializer, \
@@ -48,19 +50,19 @@ class PaymentScheduleDashboardView(generics.ListAPIView):
     serializer_class = PaymentScheduleDashboardSerializer
 
     def get_queryset(self):
-        rent_type = self.request.query_params.get('rent_type')
+        rent_type = self.request.query_params.get('rent_type', 'daily')
         today = timezone.localdate()
 
         if rent_type == 'daily':
             end_date = today + timedelta(days=3)
-            return PaymentSchedule.objects.filter(
+            return PaymentSchedule.active_objects.filter(
                 payment_date__range=(today, end_date),
                 rental__rent_type=rent_type
             )
         elif rent_type in ['monthly', 'credit']:
             start_date = today.replace(day=1)
             end_date = start_date + relativedelta(months=3)
-            return PaymentSchedule.objects.filter(
+            return PaymentSchedule.active_objects.filter(
                 payment_date__range=(start_date, end_date),
                 rental__rent_type=rent_type
             )
@@ -139,3 +141,41 @@ class RentalRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Rental.objects.all()
     serializer_class = RentalRetrieveSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class SuccessfullyPaidAPIView(APIView):
+
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter(
+            'payment_id', openapi.IN_QUERY, description="To'lov ID",
+            type=openapi.TYPE_INTEGER
+        )
+    ])
+    def post(self, request):
+        payment_id = request.query_params.get('payment_id')
+        try:
+            payment = PaymentSchedule.active_objects.get(id=payment_id)
+        except PaymentSchedule.DoesNotExist:
+            return Response(data={'detail': 'To\'lov topilmadi'}, status=404)
+
+        with transaction.atomic():
+            payment.is_paid = True
+            amount = payment.get_total_amount()
+            payment.make_payment(amount)
+            payment.save()
+
+            rental = payment.rental
+            payment_schedules = PaymentSchedule.active_objects.filter(rental=rental)
+            if payment_schedules.count() == 0:
+                rental.is_active = False
+                rental.save()
+                car = rental.car
+                if rental.rent_type != 'credit':
+                    car.status = 'active'
+                    car.save()
+                else:
+                    car.status = 'sold'
+                    car.is_active = False
+                    car.save()
+
+        return Response(data={'message': 'To\'lov muvaffaqiyatli amalga oshirildi'}, status=200)

@@ -44,8 +44,8 @@ class Car(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    active_objects = ActiveCarManager()
     objects = models.Manager()
+    active_objects = ActiveCarManager()
 
     def __str__(self):
         return f"{self.name} ({self.car_number})"

@@ -39,8 +39,8 @@ class PaymentSchedule(models.Model):
     payment_closing_date = models.DateTimeField(null=True, blank=True)
     is_paid = models.BooleanField(default=False)
 
-    active_objects = ActivePaymentScheduleManager()
     objects = models.Manager()
+    active_objects = ActivePaymentScheduleManager()
 
     def __str__(self):
         return f"Payment of {self.amount} due on {self.due_date} for rental {self.rental}"
@@ -145,8 +145,8 @@ class Rental(models.Model):
     closing_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
-    active_objects = ActiveRentalManager()
     objects = models.Manager()
+    active_objects = ActiveRentalManager()
 
     def __str__(self):
         return f"{self.fullname}: {self.phone} ({self.car.__str__()})"

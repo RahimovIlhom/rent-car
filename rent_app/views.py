@@ -8,7 +8,7 @@ from rest_framework import generics, permissions
 
 from rent_app.models import PaymentSchedule, Rental
 from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentScheduleListSerializer, \
-    CreateRentalSerializer
+    CreateRentalSerializer, ActiveRentalListSerializer
 
 
 # @method_decorator(csrf_exempt, name='dispatch')
@@ -117,3 +117,9 @@ class RentalCreateAPIView(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(data=serializer.data, status=201, headers=headers)
+
+
+class RentalListAPIView(generics.ListAPIView):
+    queryset = Rental.active_objects.all()
+    serializer_class = ActiveRentalListSerializer
+    permission_classes = [permissions.IsAuthenticated]

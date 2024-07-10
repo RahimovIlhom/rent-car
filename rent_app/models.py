@@ -152,7 +152,7 @@ class Rental(models.Model):
 
     class Meta:
         db_table = 'rentals'
-        ordering = ['end_date']
+        ordering = ['-start_date']
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -200,7 +200,7 @@ class Rental(models.Model):
 
     def get_total_amount(self):
         payment_schedules = PaymentSchedule.objects.filter(rental=self)
-        total_amount = 0.0
+        total_amount = Decimal('0.0')
         for payment_schedule in payment_schedules:
             total_amount += (payment_schedule.amount + payment_schedule.penalty_amount - payment_schedule.amount_paid)
         return total_amount

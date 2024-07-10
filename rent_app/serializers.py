@@ -54,7 +54,7 @@ class ActiveRentalListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rental
-        fields = ['id', 'fullname', 'phone', 'start_date', 'end_date', 'rent_type', 'status', 'total_amount', 'car']
+        fields = ['id', 'fullname', 'phone', 'start_date', 'end_date', 'rent_type', 'total_amount', 'car']
 
     def get_total_amount(self, obj) -> Decimal:
         return obj.get_total_amount()

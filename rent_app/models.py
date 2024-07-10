@@ -137,7 +137,7 @@ class Rental(models.Model):
     rent_period = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     initial_payment_amount = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
                                                  validators=[MinValueValidator(Decimal('0.0'))])
-    penalty_percentage = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
+    penalty_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.0'),
                                              validators=[MinValueValidator(Decimal('0.0')),
                                                          MaxValueValidator(Decimal('100.0'))])
     start_date = models.DateTimeField(auto_now_add=True)

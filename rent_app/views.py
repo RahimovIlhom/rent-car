@@ -4,10 +4,12 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from datetime import date, timedelta
-from rest_framework import generics
+from rest_framework import generics, permissions
 
-from rent_app.models import PaymentSchedule
-from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentScheduleListSerializer
+from rent_app.models import PaymentSchedule, Rental
+from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentScheduleListSerializer, \
+    CreateRentalSerializer
+
 
 # @method_decorator(csrf_exempt, name='dispatch')
 # class PaymentScheduleDashboardView(generics.ListAPIView):
@@ -92,13 +94,26 @@ class PaymentScheduleDashboardView(generics.ListAPIView):
         return Response(data)
 
     @swagger_auto_schema(manual_parameters=[
-            openapi.Parameter(
-                'rent_type', openapi.IN_QUERY, description="Filter ijara turi bo'yicha",
-                type=openapi.TYPE_STRING, enum=['daily', 'monthly', 'credit'],
-            )
-        ])
+        openapi.Parameter(
+            'rent_type', openapi.IN_QUERY, description="Filter ijara turi bo'yicha",
+            type=openapi.TYPE_STRING, enum=['daily', 'monthly', 'credit'],
+        )
+    ])
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
     class Meta:
         fields = ['date', 'payment_schedules']
+
+
+class RentalCreateAPIView(generics.CreateAPIView):
+    queryset = Rental.active_objects.all()
+    serializer_class = CreateRentalSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(data=serializer.data, status=201, headers=headers)

@@ -1,7 +1,9 @@
 from decimal import Decimal
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 from rest_framework import serializers
 
+from car_app.models import Car
 from car_app.serializers import DashboardCarSerializer
 from .models import Rental, PaymentSchedule
 
@@ -56,3 +58,41 @@ class ActiveRentalListSerializer(serializers.ModelSerializer):
 
     def get_total_amount(self, obj) -> Decimal:
         return obj.get_total_amount()
+
+
+class CreateRentalSerializer(serializers.ModelSerializer):
+    car_id = serializers.IntegerField(write_only=True)
+    RENT_TYPE_CHOICES = [
+        ('daily', 'Daily'),
+        ('monthly', 'Monthly'),
+        ('credit', 'Credit'),
+    ]
+    rent_type = serializers.ChoiceField(choices=RENT_TYPE_CHOICES)
+    rent_amount = serializers.DecimalField(max_digits=11, decimal_places=2, required=True,
+                                           validators=[MinValueValidator(Decimal('0.0'))])
+    rent_period = serializers.IntegerField(validators=[MinValueValidator(1)])
+    initial_payment_amount = serializers.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
+                                                      validators=[MinValueValidator(Decimal('0.0'))])
+    penalty_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.0'),
+                                                  validators=[MinValueValidator(Decimal('0.0')),
+                                                              MaxValueValidator(Decimal('100.0'))])
+    passport_image_front = serializers.ImageField(required=False, allow_null=True)
+    passport_image_back = serializers.ImageField(required=False, allow_null=True)
+    receipt_image = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = Rental
+        fields = ['car_id', 'fullname', 'phone', 'passport', 'passport_image_front', 'passport_image_back',
+                  'receipt_image', 'rent_type', 'rent_amount', 'rent_period', 'initial_payment_amount',
+                  'penalty_percentage']
+
+    def create(self, validated_data):
+        car_id = validated_data.pop('car_id')
+        try:
+            car = Car.objects.get(id=car_id)
+        except Car.DoesNotExist:
+            raise serializers.ValidationError({'car_id': 'Mashina topilmadi'})
+        user = self.context['request'].user
+        validated_data['employee'] = user
+        validated_data['car'] = car
+        return super().create(validated_data)

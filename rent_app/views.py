@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django_filters import rest_framework as filters
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -8,6 +10,7 @@ from rent_app.models import PaymentSchedule
 from rent_app.serializers import PaymentScheduleDashboardSerializer
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PaymentScheduleDashboardView(generics.ListAPIView):
     queryset = PaymentSchedule.objects.all()
     serializer_class = PaymentScheduleDashboardSerializer

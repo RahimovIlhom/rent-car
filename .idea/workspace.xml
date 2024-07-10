@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="dashboard payment list">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="update requirements.txt">
+      <change beforePath="$PROJECT_DIR$/rent_app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +130,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720608580408</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="update requirements.txt">
+      <option name="closed" value="true" />
+      <created>1720612300976</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1720612300976</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -141,6 +149,7 @@
     <MESSAGE value="multipart/form-data" />
     <MESSAGE value="percentage and total amount" />
     <MESSAGE value="dashboard payment list" />
-    <option name="LAST_COMMIT_MESSAGE" value="dashboard payment list" />
+    <MESSAGE value="update requirements.txt" />
+    <option name="LAST_COMMIT_MESSAGE" value="update requirements.txt" />
   </component>
 </project>

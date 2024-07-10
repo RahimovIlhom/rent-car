@@ -1,42 +1,40 @@
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import permissions
-from drf_yasg.utils import swagger_auto_schema
+from django_filters import rest_framework as filters
 from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics
 
-from .models import Rental
-from rent_app.serializers import RentalDashboardSerializer
+from rent_app.filters import PaymentScheduleFilter
+from rent_app.models import PaymentSchedule
+from rent_app.serializers import PaymentScheduleDashboardSerializer
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class DashboardRentalsView(APIView):
-    serializer_class = RentalDashboardSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class PaymentScheduleDashboardView(generics.ListAPIView):
+    queryset = PaymentSchedule.objects.all()
+    serializer_class = PaymentScheduleDashboardSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = PaymentScheduleFilter
 
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(
-                'rent_type',
-                openapi.IN_QUERY,
-                description="Ijara turi bo'yicha filter",
-                type=openapi.TYPE_STRING,
-                enum=['daily', 'monthly', 'credit']
-            )
-        ],
-        responses={
-            200: RentalDashboardSerializer(many=True)
-        }
-    )
-    def get(self, request):
-        rent_type = request.query_params.get('rent_type', None)
-        rentals = Rental.active_objects.all()
+    def get_queryset(self):
+        queryset = PaymentSchedule.active_objects.all()
+        return queryset
 
-        if rent_type:
-            rentals = rentals.filter(rent_type=rent_type)
-        else:
-            rentals = rentals.filter(rent_type='daily')
-
-        serializer = self.serializer_class(rentals, many=True)
-        return Response(serializer.data)
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter(
+            'rent_type', openapi.IN_QUERY, description="Filter ijara turi bo'yicha",
+            type=openapi.TYPE_STRING, enum=['daily', 'monthly', 'credit'],
+        ),
+        openapi.Parameter(
+            'year', openapi.IN_QUERY, description="Filter yil bo'yicha",
+            type=openapi.TYPE_INTEGER
+        ),
+        openapi.Parameter(
+            'month', openapi.IN_QUERY, description="Filter oy bo'yicha",
+            type=openapi.TYPE_INTEGER
+        ),
+        openapi.Parameter(
+            'day', openapi.IN_QUERY, description="Filter kun bo'yicha",
+            type=openapi.TYPE_INTEGER
+        ),
+    ])
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)

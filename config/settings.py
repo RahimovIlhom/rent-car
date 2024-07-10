@@ -9,7 +9,6 @@ env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -20,7 +19,6 @@ SECRET_KEY = env.str('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -37,6 +35,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'django_filters',
 
     # local apps
     'users',
@@ -63,6 +62,10 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FormParser',
         'rest_framework.parsers.MultiPartParser',
     ),
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        # 'rent_app.filters.PaymentScheduleFilter',
+    ],
     # 'EXCEPTION_HANDLER': 'users.utils.custom_exception_handler',  # Custom exception handlerni qo'shish
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
 }
@@ -92,7 +95,6 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': 'token_type',
     'JTI_CLAIM': 'jti',
 }
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -128,10 +130,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env.str('MYSQL_DB_NAME'),
+        'USER': env.str('MYSQL_DB_USER'),
+        'PASSWORD': env.str('MYSQL_DB_PASSWORD'),
+        'HOST': env.str('MYSQL_DB_HOST'),
+        'PORT': env.str('MYSQL_DB_PORT'),
     }
 }
 

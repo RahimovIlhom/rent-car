@@ -18,6 +18,11 @@ RENT_TYPES = (
 )
 
 
+class ActivePaymentScheduleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_paid=False)
+
+
 class ActiveRentalManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(car__is_active=True)
@@ -26,12 +31,16 @@ class ActiveRentalManager(models.Manager):
 class PaymentSchedule(models.Model):
     rental = models.ForeignKey('Rental', on_delete=models.CASCADE, related_name='payment_schedule')
     due_date = models.DateTimeField()
+    payment_date = models.DateField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     penalty_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.0'))
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.0'))
     paid_date = models.DateTimeField(null=True, blank=True)
     payment_closing_date = models.DateTimeField(null=True, blank=True)
     is_paid = models.BooleanField(default=False)
+
+    active_objects = ActivePaymentScheduleManager()
+    objects = models.Manager()
 
     def __str__(self):
         return f"Payment of {self.amount} due on {self.due_date} for rental {self.rental}"
@@ -172,6 +181,7 @@ class Rental(models.Model):
             PaymentSchedule.objects.create(
                 rental=self,
                 due_date=due_date,
+                payment_date=due_date.date(),
                 amount=self.rent_amount
             )
             current_date = due_date
@@ -180,6 +190,7 @@ class Rental(models.Model):
         PaymentSchedule.objects.create(
             rental=self,
             due_date=self.end_date,
+            payment_date=self.end_date.date(),
             amount=self.rent_amount * self.rent_period
         )
 

@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="multipart/form-data">
+    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="percentage and total amount">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rent_app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent_app/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent_app/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent_app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,7 +120,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720534372853</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="percentage and total amount">
+      <option name="closed" value="true" />
+      <created>1720536456741</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1720536456741</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -125,6 +137,7 @@
     <MESSAGE value="csrf token add" />
     <MESSAGE value="fuel_type update" />
     <MESSAGE value="multipart/form-data" />
-    <option name="LAST_COMMIT_MESSAGE" value="multipart/form-data" />
+    <MESSAGE value="percentage and total amount" />
+    <option name="LAST_COMMIT_MESSAGE" value="percentage and total amount" />
   </component>
 </project>

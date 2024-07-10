@@ -116,7 +116,7 @@ class PaymentSchedule(models.Model):
 
     def get_total_amount(self) -> Decimal:
         """
-        Umumiy to'lov summasi
+        Umumiy to'lanishi kerak summasi
         :return:
         """
         total_amount = self.amount + self.get_percentage_amount() - self.amount_paid
@@ -164,12 +164,13 @@ class Rental(models.Model):
             else:
                 raise ValidationError(detail="This car is not active for rent.", code=400)
 
+            rent_hour = self.start_date.hour
             if self.rent_type == 'daily':
-                rent_hour = self.start_date.hour
                 self.end_date = self.start_date + timedelta(days=self.rent_period)
                 self.end_date = self.end_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
             elif self.rent_type in ['monthly', 'credit']:
-                self.end_date = self.start_date + relativedelta(months=self.rent_period)
+                self.end_date = (self.start_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0) +
+                                 relativedelta(months=self.rent_period))
 
         super().save(*args, **kwargs)
 
@@ -204,4 +205,11 @@ class Rental(models.Model):
         total_amount = Decimal('0.0')
         for payment_schedule in payment_schedules:
             total_amount += (payment_schedule.amount + payment_schedule.penalty_amount - payment_schedule.amount_paid)
+        return total_amount
+
+    def get_total_paid_amount(self):
+        payment_schedules = PaymentSchedule.objects.filter(rental=self)
+        total_amount = Decimal('0.0')
+        for payment_schedule in payment_schedules:
+            total_amount += payment_schedule.amount_paid
         return total_amount

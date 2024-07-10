@@ -52,13 +52,29 @@ class ActiveRentalListSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     car = DashboardCarSerializer(read_only=True)
     total_amount = serializers.SerializerMethodField('get_total_amount')
+    employee = EmployeeSerializer(read_only=True)
 
     class Meta:
         model = Rental
-        fields = ['id', 'fullname', 'phone', 'start_date', 'end_date', 'rent_type', 'total_amount', 'car']
+        fields = ['id', 'employee', 'fullname', 'phone', 'start_date', 'end_date', 'rent_type', 'total_amount', 'car']
 
     def get_total_amount(self, obj) -> Decimal:
         return obj.get_total_amount()
+
+
+class NoActiveRentalListSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    car = DashboardCarSerializer(read_only=True)
+    total_paid_amount = serializers.SerializerMethodField('get_total_paid_amount')
+    employee = EmployeeSerializer(read_only=True)
+
+    class Meta:
+        model = Rental
+        fields = ['id', 'employee', 'fullname', 'phone', 'start_date', 'end_date', 'closing_date', 'rent_type',
+                  'total_paid_amount', 'car']
+
+    def get_total_paid_amount(self, obj) -> Decimal:
+        return obj.get_total_paid_amount()
 
 
 class CreateRentalSerializer(serializers.ModelSerializer):
@@ -121,7 +137,8 @@ class RentalRetrieveSerializer(serializers.ModelSerializer):
         fields = ['id', 'employee', 'car', 'fullname', 'phone', 'passport', 'passport_image_front',
                   'passport_image_back', 'receipt_image', 'rent_type', 'rent_amount', 'rent_period',
                   'initial_payment_amount', 'penalty_percentage', 'start_date', 'end_date', 'closing_date',
-                  'is_active', 'payment_schedules', 'amount', 'total_amount', 'total_penalty_amount', 'total_paid_amount']
+                  'is_active', 'payment_schedules', 'amount', 'total_amount', 'total_penalty_amount',
+                  'total_paid_amount']
 
     def get_payment_schedules(self, obj):
         return PaymentScheduleListForRentalSerializer(obj.payment_schedule.all(), many=True).data
@@ -130,11 +147,7 @@ class RentalRetrieveSerializer(serializers.ModelSerializer):
         return obj.rent_amount * obj.rent_period
 
     def get_total_amount(self, obj) -> Decimal:
-        payment_schodules = obj.payment_schedule.all()
-        total_penalty_amount = Decimal('0.0')
-        for payment_schedule in payment_schodules:
-            total_penalty_amount += (payment_schedule.amount + payment_schedule.penalty_amount)
-        return total_penalty_amount
+        return obj.get_total_amount()
 
     def get_total_penalty_amount(self, obj) -> Decimal:
         payment_schodules = obj.payment_schedule.all()
@@ -144,8 +157,4 @@ class RentalRetrieveSerializer(serializers.ModelSerializer):
         return total_penalty_amount
 
     def get_paid_amount(self, obj) -> Decimal:
-        payment_schodules = obj.payment_schedule.all()
-        total_paid_amount = Decimal('0.0')
-        for payment_schedule in payment_schodules:
-            total_paid_amount += payment_schedule.amount_paid
-        return total_paid_amount
+        return obj.get_total_paid_amount()

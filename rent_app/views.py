@@ -8,7 +8,7 @@ from rest_framework import generics, permissions, parsers
 
 from rent_app.models import PaymentSchedule, Rental
 from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentScheduleListSerializer, \
-    CreateRentalSerializer, ActiveRentalListSerializer, RentalRetrieveSerializer
+    CreateRentalSerializer, ActiveRentalListSerializer, RentalRetrieveSerializer, NoActiveRentalListSerializer
 
 
 # @method_decorator(csrf_exempt, name='dispatch')
@@ -106,10 +106,19 @@ class PaymentScheduleDashboardView(generics.ListAPIView):
         fields = ['date', 'payment_schedules']
 
 
-class RentalListAPIView(generics.ListAPIView):
+class ActiveRentalListAPIView(generics.ListAPIView):
     queryset = Rental.active_objects.all()
     serializer_class = ActiveRentalListSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class NoActiveRentalListAPIView(generics.ListAPIView):
+    queryset = Rental.objects.all()
+    serializer_class = NoActiveRentalListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return super().get_queryset().filter(car__is_active=False)
 
 
 class RentalCreateAPIView(generics.CreateAPIView):

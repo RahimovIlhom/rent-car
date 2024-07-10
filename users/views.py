@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model, authenticate
@@ -10,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import UserSerializer, ChangePasswordSerializer
+from .serializers import UserSerializer, ChangePasswordSerializer, EmployeesListSerializer, EmployeeUpdateSerializer
 
 User = get_user_model()
 
@@ -403,3 +404,35 @@ class ResetPasswordView(APIView):
             return Response({"error": "Foydalanuvchi topilmadi!"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserListAPIView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = EmployeesListSerializer
+    permission_classes = [IsAdminUser]
+
+
+class EmployeeUpdateAPIView(APIView):
+    serializer_class = EmployeeUpdateSerializer
+    permission_classes = [IsAdminUser]
+
+    @swagger_auto_schema(
+        operation_description="Update an employee's details",
+        request_body=EmployeeUpdateSerializer,
+        responses={
+            200: EmployeeUpdateSerializer,
+            400: openapi.Response('Bad Request'),
+            404: openapi.Response('Not Found')
+        }
+    )
+    def patch(self, request):
+        user_id = request.data.get('user_id')
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"detail": "Foydalanuvchi topilmadi!"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = EmployeeUpdateSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

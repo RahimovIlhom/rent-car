@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="56020c3c-8ea9-445b-9b14-a1a5bab75feb" name="Changes" comment="rental retrieve">
+    <list default="true" id="56020c3c-8ea9-445b-9b14-a1a5bab75feb" name="Changes" comment="no active rentals list">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rent_app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rent_app/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rent_app/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rent_app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/users/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,12 +78,21 @@
       <option name="project" value="LOCAL" />
       <updated>1720638853518</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="no active rentals list">
+      <option name="closed" value="true" />
+      <created>1720641438914</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1720641438914</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="rental list" />
     <MESSAGE value="rental retrieve" />
-    <option name="LAST_COMMIT_MESSAGE" value="rental retrieve" />
+    <MESSAGE value="no active rentals list" />
+    <option name="LAST_COMMIT_MESSAGE" value="no active rentals list" />
   </component>
 </project>

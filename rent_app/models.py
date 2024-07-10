@@ -147,6 +147,9 @@ class Rental(models.Model):
 
     active_objects = ActiveRentalManager()
 
+    def __str__(self):
+        return f"{self.fullname}: {self.phone} ({self.car.__str__()})"
+
     class Meta:
         db_table = 'rentals'
         ordering = ['end_date']
@@ -195,5 +198,9 @@ class Rental(models.Model):
             amount=self.rent_amount * self.rent_period
         )
 
-    def __str__(self):
-        return f"{self.fullname}: {self.phone} ({self.car.__str__()})"
+    def get_total_amount(self):
+        payment_schedules = PaymentSchedule.objects.filter(rental=self)
+        total_amount = 0.0
+        for payment_schedule in payment_schedules:
+            total_amount += (payment_schedule.amount + payment_schedule.penalty_amount - payment_schedule.amount_paid)
+        return total_amount

@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="update requirements.txt">
-      <change beforePath="$PROJECT_DIR$/rent_app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/views.py" afterDir="false" />
+    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="csrf token ignore">
+      <change beforePath="$PROJECT_DIR$/rent_app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720612300976</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="csrf token ignore">
+      <option name="closed" value="true" />
+      <created>1720612467138</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1720612467138</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -150,6 +158,7 @@
     <MESSAGE value="percentage and total amount" />
     <MESSAGE value="dashboard payment list" />
     <MESSAGE value="update requirements.txt" />
-    <option name="LAST_COMMIT_MESSAGE" value="update requirements.txt" />
+    <MESSAGE value="csrf token ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="csrf token ignore" />
   </component>
 </project>

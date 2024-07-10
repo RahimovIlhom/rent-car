@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="csrf token ignore">
+    <list default="true" id="b6989464-ccaa-41db-b350-586024d9b897" name="Changes" comment="decimal digits count update">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rent_app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent_app/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/serializers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +148,15 @@
       <option name="project" value="LOCAL" />
       <updated>1720612467138</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="decimal digits count update">
+      <option name="closed" value="true" />
+      <created>1720613652417</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1720613652417</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -159,6 +169,7 @@
     <MESSAGE value="dashboard payment list" />
     <MESSAGE value="update requirements.txt" />
     <MESSAGE value="csrf token ignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="csrf token ignore" />
+    <MESSAGE value="decimal digits count update" />
+    <option name="LAST_COMMIT_MESSAGE" value="decimal digits count update" />
   </component>
 </project>

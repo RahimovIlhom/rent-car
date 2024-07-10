@@ -91,12 +91,12 @@ class PaymentSchedule(models.Model):
 
         self.save()
 
-    def get_percentage_amount(self):
+    def get_percentage_amount(self) -> Decimal:
         """
         To'lov jarimasini hisoblaydi
         """
         if self.is_paid:
-            return 0.0
+            return Decimal('0.0')
 
         # Jarimani hisoblash
         current_date = timezone.now()
@@ -112,14 +112,15 @@ class PaymentSchedule(models.Model):
                 overdue_hours = overdue_time.total_seconds() // 3600
                 penalty = self.amount * penalty_rate * overdue_hours
 
-        return penalty
+        return Decimal(penalty)
 
-    def get_total_amount(self):
+    def get_total_amount(self) -> Decimal:
         """
         Umumiy to'lov summasi
         :return:
         """
-        return self.amount + self.get_percentage_amount()
+        total_amount = self.amount + self.get_percentage_amount() - self.amount_paid
+        return Decimal(total_amount)
 
 
 class Rental(models.Model):

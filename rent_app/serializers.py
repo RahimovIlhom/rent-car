@@ -4,7 +4,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from rest_framework import serializers
 
 from car_app.models import Car
-from car_app.serializers import DashboardCarSerializer
+from car_app.serializers import DashboardCarSerializer, CarDetailSerializer
+from users.serializers import EmployeeSerializer
 from .models import Rental, PaymentSchedule
 
 
@@ -96,3 +97,55 @@ class CreateRentalSerializer(serializers.ModelSerializer):
         validated_data['employee'] = user
         validated_data['car'] = car
         return super().create(validated_data)
+
+
+class PaymentScheduleListForRentalSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = PaymentSchedule
+        fields = ['id', 'due_date', 'amount', 'penalty_amount', 'amount_paid', 'payment_closing_date', 'is_paid']
+
+
+class RentalRetrieveSerializer(serializers.ModelSerializer):
+    employee = EmployeeSerializer(read_only=True)
+    car = CarDetailSerializer(read_only=True)
+    payment_schedules = serializers.SerializerMethodField('get_payment_schedules')
+    amount = serializers.SerializerMethodField('get_amount')
+    total_amount = serializers.SerializerMethodField('get_total_amount')
+    total_penalty_amount = serializers.SerializerMethodField('get_total_penalty_amount')
+    total_paid_amount = serializers.SerializerMethodField('get_paid_amount')
+
+    class Meta:
+        model = Rental
+        fields = ['id', 'employee', 'car', 'fullname', 'phone', 'passport', 'passport_image_front',
+                  'passport_image_back', 'receipt_image', 'rent_type', 'rent_amount', 'rent_period',
+                  'initial_payment_amount', 'penalty_percentage', 'start_date', 'end_date', 'closing_date',
+                  'is_active', 'payment_schedules', 'amount', 'total_amount', 'total_penalty_amount', 'total_paid_amount']
+
+    def get_payment_schedules(self, obj):
+        return PaymentScheduleListForRentalSerializer(obj.payment_schedule.all(), many=True).data
+
+    def get_amount(self, obj) -> Decimal:
+        return obj.rent_amount * obj.rent_period
+
+    def get_total_amount(self, obj) -> Decimal:
+        payment_schodules = obj.payment_schedule.all()
+        total_penalty_amount = Decimal('0.0')
+        for payment_schedule in payment_schodules:
+            total_penalty_amount += (payment_schedule.amount + payment_schedule.penalty_amount)
+        return total_penalty_amount
+
+    def get_total_penalty_amount(self, obj) -> Decimal:
+        payment_schodules = obj.payment_schedule.all()
+        total_penalty_amount = Decimal('0.0')
+        for payment_schedule in payment_schodules:
+            total_penalty_amount += payment_schedule.penalty_amount
+        return total_penalty_amount
+
+    def get_paid_amount(self, obj) -> Decimal:
+        payment_schodules = obj.payment_schedule.all()
+        total_paid_amount = Decimal('0.0')
+        for payment_schedule in payment_schodules:
+            total_paid_amount += payment_schedule.amount_paid
+        return total_paid_amount

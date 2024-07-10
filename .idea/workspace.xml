@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="56020c3c-8ea9-445b-9b14-a1a5bab75feb" name="Changes" comment="">
+    <list default="true" id="56020c3c-8ea9-445b-9b14-a1a5bab75feb" name="Changes" comment="rental list">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/config/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rent_app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rent_app/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rent_app/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/rent_app/urls.py" afterDir="false" />
@@ -64,6 +63,19 @@
       <option name="presentableId" value="Default" />
       <updated>1720633855671</updated>
     </task>
+    <task id="LOCAL-00001" summary="rental list">
+      <option name="closed" value="true" />
+      <created>1720636999196</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1720636999196</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="rental list" />
+    <option name="LAST_COMMIT_MESSAGE" value="rental list" />
   </component>
 </project>

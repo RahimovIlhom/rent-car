@@ -146,6 +146,7 @@ class Rental(models.Model):
     is_active = models.BooleanField(default=True)
 
     active_objects = ActiveRentalManager()
+    objects = models.Manager()
 
     def __str__(self):
         return f"{self.fullname}: {self.phone} ({self.car.__str__()})"

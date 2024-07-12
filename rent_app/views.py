@@ -1,6 +1,8 @@
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
@@ -46,6 +48,7 @@ from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentSche
 #         return super().get(request, *args, **kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PaymentScheduleDashboardView(generics.ListAPIView):
     serializer_class = PaymentScheduleDashboardSerializer
 
@@ -108,12 +111,14 @@ class PaymentScheduleDashboardView(generics.ListAPIView):
         fields = ['date', 'payment_schedules']
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ActiveRentalListAPIView(generics.ListAPIView):
     queryset = Rental.active_objects.all()
     serializer_class = ActiveRentalListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class NoActiveRentalListAPIView(generics.ListAPIView):
     queryset = Rental.objects.all()
     serializer_class = NoActiveRentalListSerializer
@@ -123,6 +128,7 @@ class NoActiveRentalListAPIView(generics.ListAPIView):
         return super().get_queryset().filter(car__is_active=False)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class RentalCreateAPIView(generics.CreateAPIView):
     queryset = Rental.active_objects.all()
     serializer_class = CreateRentalSerializer
@@ -137,12 +143,14 @@ class RentalCreateAPIView(generics.CreateAPIView):
         return Response(data=serializer.data, status=201, headers=headers)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class RentalRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Rental.objects.all()
     serializer_class = RentalRetrieveSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class SuccessfullyPaidAPIView(APIView):
 
     @swagger_auto_schema(manual_parameters=[

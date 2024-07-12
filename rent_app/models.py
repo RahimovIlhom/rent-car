@@ -1,7 +1,7 @@
 from datetime import timedelta
 from decimal import Decimal
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.db import models
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
@@ -129,9 +129,26 @@ class Rental(models.Model):
     fullname = models.CharField(max_length=255)
     phone = models.CharField(max_length=50)
     passport = models.CharField(max_length=50)
-    passport_image_front = models.ImageField(upload_to='rentals/passport/images', null=True, blank=True)
-    passport_image_back = models.ImageField(upload_to='rentals/passport/images', null=True, blank=True)
-    receipt_image = models.ImageField(upload_to='rentals/receipt/images', null=True, blank=True)
+    passport_image_front = models.ImageField(upload_to='rentals/passport/images', null=True, blank=True,
+                                             validators=[
+                                                 FileExtensionValidator(
+                                                     allowed_extensions=
+                                                     ['jpg', 'png', 'HEIC', 'jpeg', 'gif', 'bmp', 'tiff', 'webp'],
+                                                 )])
+    passport_image_back = models.ImageField(upload_to='rentals/passport/images', null=True, blank=True,
+                                            validators=[
+                                                FileExtensionValidator(
+                                                    allowed_extensions=
+                                                    ['jpg', 'png', 'HEIC', 'jpeg', 'gif', 'bmp', 'tiff', 'webp'],
+                                                )]
+                                            )
+    receipt_image = models.ImageField(upload_to='rentals/receipt/images', null=True, blank=True,
+                                      validators=[
+                                          FileExtensionValidator(
+                                              allowed_extensions=
+                                              ['jpg', 'png', 'HEIC', 'jpeg', 'gif', 'bmp', 'tiff', 'webp'],
+                                          )]
+                                      )
     rent_type = models.CharField(max_length=20, choices=RENT_TYPES, default='daily')
     rent_amount = models.DecimalField(max_digits=11, decimal_places=2, validators=[MinValueValidator(Decimal('0.0'))])
     rent_period = models.PositiveIntegerField(validators=[MinValueValidator(1)])

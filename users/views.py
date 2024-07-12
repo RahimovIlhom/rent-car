@@ -470,12 +470,14 @@ class ResetPasswordView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UserListAPIView(ListAPIView):
     queryset = User.objects.all()
     serializer_class = EmployeesListSerializer
     permission_classes = [IsAdminUser]
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class EmployeeUpdateAPIView(APIView):
     serializer_class = EmployeeUpdateSerializer
     permission_classes = [IsAdminUser]

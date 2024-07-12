@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
-
+from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 
 employee_model = get_user_model()
 
@@ -36,8 +35,20 @@ class Car(models.Model):
                                                                               MaxValueValidator(2100)])
     information = models.TextField(null=True, blank=True)
     tech_passport_number = models.CharField(max_length=255)
-    tech_passport_image_front = models.ImageField(upload_to='cars/tech_passport/images', null=True, blank=True)
-    tech_passport_image_back = models.ImageField(upload_to='cars/tech_passport/images', null=True, blank=True)
+    tech_passport_image_front = models.ImageField(upload_to='cars/tech_passport/images', null=True, blank=True,
+                                                  validators=[
+                                                      FileExtensionValidator(
+                                                          allowed_extensions=
+                                                          ['jpg', 'png', 'HEIC', 'jpeg', 'gif', 'bmp', 'tiff', 'webp'],
+                                                      )]
+                                                  )
+    tech_passport_image_back = models.ImageField(upload_to='cars/tech_passport/images', null=True, blank=True,
+                                                 validators=[
+                                                     FileExtensionValidator(
+                                                         allowed_extensions=
+                                                         ['jpg', 'png', 'HEIC', 'jpeg', 'gif', 'bmp', 'tiff', 'webp'],
+                                                     )]
+                                                 )
     fuel_type = models.CharField(max_length=25, default='petrol')
     status = models.CharField(max_length=25, choices=CAR_STATUS, default='active')
     is_active = models.BooleanField(default=True)

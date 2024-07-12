@@ -35,12 +35,17 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'channels',
+    'django_crontab',
 
     # local apps
     'users',
     'home_app',
     'car_app',
     'rent_app.apps.RentAppConfig',
+]
+
+CRONJOBS = [
+    ('0 8 * * *', 'rent_app.management.commands.send_payment_reminders')
 ]
 
 REST_FRAMEWORK = {
@@ -139,6 +144,11 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+TWILIO_ACCOUNT_SID = env.str('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = env.str('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = env.str('TWILIO_PHONE_NUMBER')
+
 
 # DATABASES = {
 #     'default': {

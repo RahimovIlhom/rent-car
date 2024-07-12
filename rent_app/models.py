@@ -162,7 +162,7 @@ class Rental(models.Model):
                 self.car.status = 'rented'
                 self.car.save()
             else:
-                raise ValidationError(detail="This car is not active for rent.", code=400)
+                raise ValidationError(detail="Bu mashina faol emas. Allaqachon ijaraga berilgan", code=400)
 
             rent_hour = self.start_date.hour
             if self.rent_type == 'daily':

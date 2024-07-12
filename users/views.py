@@ -149,6 +149,70 @@ class LoginView(APIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class AdminLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_description="Admin Login endpoint",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password'),
+            },
+            required=['username', 'password'],
+        ),
+        responses={
+            200: openapi.Response('Admin Login successful', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'username': openapi.Schema(type=openapi.TYPE_STRING, description="username"),
+                    'fullname': openapi.Schema(type=openapi.TYPE_STRING, description="fullname"),
+                    'phone': openapi.Schema(type=openapi.TYPE_STRING, description="phone"),
+                    'is_admin': openapi.Schema(type=openapi.TYPE_STRING, description="is_staff"),
+                    'access': openapi.Schema(type=openapi.TYPE_STRING, description='Access token'),
+                    'refresh': openapi.Schema(type=openapi.TYPE_STRING, description='Refresh token'),
+                }
+            )),
+            400: openapi.Response(
+                description="Invalid credentials",
+                examples={
+                    "application/json": {
+                        "error": "Login yoki parol xato!"
+                    }
+                }
+            ),
+            405: openapi.Response(
+                description="Method Not Allowed",
+                examples={
+                    "application/json": {
+                        "detail": "Bunday amal mavjud emas."
+                    }
+                }
+            ),
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_staff:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'username': user.username,
+                    'fullname': user.fullname,
+                    'phone': user.phone,
+                    'is_admin': user.is_staff,
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                })
+            else:
+                return Response({"error": "Bu foydalanuvchi admin emas!"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Login yoki parol xato!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 

@@ -5,5 +5,5 @@ class RentAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'rent_app'
 
-    def ready(self):
-        import rent_app.signals
+    # def ready(self):
+    #     import rent_app.signals

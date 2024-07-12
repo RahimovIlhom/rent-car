@@ -13,14 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
+    # 'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -132,18 +132,18 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
-ASGI_APPLICATION = 'config.asgi.application'
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6380)],
-        },
-    },
-}
+# WSGI_APPLICATION = 'config.wsgi.application'
+#
+# ASGI_APPLICATION = 'config.asgi.application'
+#
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6380)],
+#         },
+#     },
+# }
 
 TWILIO_ACCOUNT_SID = env.str('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = env.str('TWILIO_AUTH_TOKEN')

@@ -1,5 +1,7 @@
 asgiref==3.8.1
 attrs==23.2.0
+channels==4.1.0
+channels-redis==4.2.0
 chardet==5.2.0
 Django==4.2.14
 django-cors-headers==4.4.0
@@ -14,6 +16,7 @@ inflection==0.5.1
 jsonschema==4.23.0
 jsonschema-specifications==2023.12.1
 marshmallow==3.21.3
+msgpack==1.0.8
 mysqlclient==2.2.4
 packaging==24.1
 pillow==10.3.0
@@ -22,6 +25,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.1
 PyYAML==6.0.1
+redis==5.0.7
 referencing==0.35.1
 reportlab==4.2.2
 rpds-py==0.19.0

@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import locale
 from reportlab.lib.pagesizes import A4
@@ -44,7 +45,11 @@ def pdf_writer(data):
         schedule['payment_closing_date'] = format_date(schedule['payment_closing_date'])
 
     # Create the PDF document with adjusted margins
-    pdf_file = f"media/rentals/contracts/contract{data['id']}.pdf"
+    directory = "media/rentals/contracts"
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    pdf_file = f"{directory}/contract{data['id']}.pdf"
     document = SimpleDocTemplate(pdf_file, pagesize=A4, leftMargin=40, rightMargin=40, topMargin=40, bottomMargin=40)
     styles = getSampleStyleSheet()
     elements = []

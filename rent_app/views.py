@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
+from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -13,6 +14,7 @@ from rest_framework.views import APIView
 from rent_app.models import PaymentSchedule, Rental
 from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentScheduleListSerializer, \
     CreateRentalSerializer, ActiveRentalListSerializer, RentalRetrieveSerializer, NoActiveRentalListSerializer
+from rent_app.utils import pdf_writer
 
 
 # @method_decorator(csrf_exempt, name='dispatch')
@@ -189,11 +191,30 @@ class SuccessfullyPaidAPIView(APIView):
         return Response(data={'message': 'To\'lov muvaffaqiyatli amalga oshirildi'}, status=200)
 
 
-# @method_decorator(csrf_exempt, name='dispatch')
-# class GeneratePDF(APIView):
-#     def post(self, request):
-#         data = request.data
-#         pdf = pdf_writer(data)
-#         response = HttpResponse(pdf, content_type='application/pdf')
-#         response['Content-Disposition'] = 'attachment; filename="rent.pdf"'
-#         return response
+@method_decorator(csrf_exempt, name='dispatch')
+class GeneratePDF(APIView):
+
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter(
+            'rent_id', openapi.IN_QUERY, description="Ijara ID",
+            type=openapi.TYPE_INTEGER
+        )
+    ])
+    def get(self, request, *args, **kwargs):
+        rent_id = request.query_params.get('rent_id')
+        if not rent_id:
+            return Response(data={'detail': 'Ijara ID kerak'}, status=400)
+
+        try:
+            rental = Rental.objects.get(id=rent_id)
+        except Rental.DoesNotExist:
+            return Response(data={'detail': 'Ijara topilmadi'}, status=404)
+
+        serializer = RentalRetrieveSerializer(rental)
+        pdf_path = pdf_writer(serializer.data)
+
+        with open(pdf_path, 'rb') as pdf:
+            pdf = pdf.read()
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="rent-{rental.id}.pdf"'
+            return response

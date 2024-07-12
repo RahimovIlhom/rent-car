@@ -134,4 +134,4 @@ def pdf_writer(data):
     # Build the PDF
     document.build(elements)
 
-    print(f"PDF created successfully: {pdf_file}")
+    return pdf_file

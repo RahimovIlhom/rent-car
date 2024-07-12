@@ -11,7 +11,7 @@ class DashboardCarSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Car
-        fields = ['id', 'name', 'status']
+        fields = ['id', 'name', 'car_number', 'status']
 
 
 CAR_STATUS = (

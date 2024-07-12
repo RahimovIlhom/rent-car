@@ -187,3 +187,13 @@ class SuccessfullyPaidAPIView(APIView):
                     car.save()
 
         return Response(data={'message': 'To\'lov muvaffaqiyatli amalga oshirildi'}, status=200)
+
+
+# @method_decorator(csrf_exempt, name='dispatch')
+# class GeneratePDF(APIView):
+#     def post(self, request):
+#         data = request.data
+#         pdf = pdf_writer(data)
+#         response = HttpResponse(pdf, content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename="rent.pdf"'
+#         return response

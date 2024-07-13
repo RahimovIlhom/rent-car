@@ -127,7 +127,7 @@ class NoActiveRentalListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return super().get_queryset().filter(car__is_active=False)
+        return super().get_queryset().filter(is_active=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')

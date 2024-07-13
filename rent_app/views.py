@@ -218,3 +218,15 @@ class GeneratePDF(APIView):
             response = HttpResponse(pdf, content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="rent-{rental.id}.pdf"'
             return response
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UnPaidPaymentScheduleDashboardView(generics.ListAPIView):
+    queryset = PaymentSchedule.active_objects.all()
+    serializer_class = PaymentScheduleListSerializer
+
+    def get_queryset(self):
+        now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        print(now)
+        return PaymentSchedule.active_objects.filter(due_date__lte=now, is_paid=False)
+

@@ -198,7 +198,8 @@ class Rental(models.Model):
                 self.create_payment_schedule()
 
     def create_payment_schedule(self):
-        current_date = self.start_date
+        rent_hour = self.start_date.hour
+        current_date = self.start_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
         for _ in range(self.rent_period):
             due_date = current_date + relativedelta(months=1)
             PaymentSchedule.objects.create(

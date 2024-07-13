@@ -25,7 +25,7 @@ class ActivePaymentScheduleManager(models.Manager):
 
 class ActiveRentalManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(car__is_active=True)
+        return super().get_queryset().filter(is_active=True)
 
 
 class PaymentSchedule(models.Model):

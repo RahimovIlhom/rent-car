@@ -80,6 +80,13 @@ class PaymentScheduleDashboardView(generics.ListAPIView):
         today = timezone.localdate()
         data = []
 
+        now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        filtered_schedules = queryset.filter(due_date__lte=now)
+        data.append({
+            'date': 'unpaid',
+            'payment_schedules': PaymentScheduleListSerializer(filtered_schedules, many=True).data
+        })
+
         if rent_type == 'daily':
             date_ranges = [today + timedelta(days=i) for i in range(3)]
             for d in date_ranges:
@@ -220,13 +227,13 @@ class GeneratePDF(APIView):
             return response
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class UnPaidPaymentScheduleDashboardView(generics.ListAPIView):
-    queryset = PaymentSchedule.active_objects.all()
-    serializer_class = PaymentScheduleListSerializer
-
-    def get_queryset(self):
-        now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        print(now)
-        return PaymentSchedule.active_objects.filter(due_date__lte=now, is_paid=False)
+# @method_decorator(csrf_exempt, name='dispatch')
+# class UnPaidPaymentScheduleDashboardView(generics.ListAPIView):
+#     queryset = PaymentSchedule.active_objects.all()
+#     serializer_class = PaymentScheduleListSerializer
+#
+#     def get_queryset(self):
+#         now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+#         print(now)
+#         return PaymentSchedule.active_objects.filter(due_date__lte=now, is_paid=False)
 

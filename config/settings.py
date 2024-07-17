@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'home_app',
     'car_app',
     'rent_app.apps.RentAppConfig',
+    'payment',
 ]
 
 CRONJOBS = [

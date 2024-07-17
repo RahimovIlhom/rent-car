@@ -70,7 +70,7 @@ class PaymentSchedule(models.Model):
                 overdue_hours = overdue_time.total_seconds() // 3600
                 penalty = penalty_rate * overdue_hours
 
-        total_payment = self.amount + penalty
+        total_payment = self.amount + penalty - self.amount_paid
         self.penalty_amount = penalty
         self.save()
         return total_payment
@@ -80,17 +80,20 @@ class PaymentSchedule(models.Model):
         To'lovni amalga oshirish va tegishli maydonlarni yangilash.
         """
         total_payment = self.calculate_payment()
+        excess_amount = Decimal('0.0')
 
-        self.amount_paid += payment_amount
-
-        if self.amount_paid >= total_payment:
+        if payment_amount >= total_payment:
+            self.amount_paid += total_payment
+            excess_amount = payment_amount - total_payment
             self.is_paid = True
             self.paid_date = timezone.now()
             self.payment_closing_date = timezone.now()
         else:
+            self.amount_paid += payment_amount
             self.paid_date = timezone.now()
 
         self.save()
+        return excess_amount
 
     def get_percentage_amount(self) -> Decimal:
         """

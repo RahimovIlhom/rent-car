@@ -1,6 +1,8 @@
 from decimal import Decimal
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+
 from rent_app.models import PaymentSchedule, Rental
 
 
@@ -29,4 +31,17 @@ class Payment(models.Model):
                     excess_amount = payment_schedule.make_payment(excess_amount)
                 else:
                     excess_amount = Decimal('0.0')
+        payment_schedules = PaymentSchedule.active_objects.filter(rental=self.rental)
+        if payment_schedules.count() == 0:
+            self.rental.is_active = False
+            self.rental.closing_date = timezone.now().date()
+            self.rental.save()
+            car = self.rental.car
+            if self.rental.rent_type != 'credit':
+                car.status = 'active'
+                car.save()
+            else:
+                car.status = 'sold'
+                car.is_active = False
+                car.save()
         super().save(*args, **kwargs)

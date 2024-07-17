@@ -170,6 +170,7 @@ class Rental(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=False, blank=True)
     closing_date = models.DateField(null=True, blank=True)
+    bad_rental = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
     objects = models.Manager()

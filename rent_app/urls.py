@@ -8,6 +8,7 @@ urlpatterns = [
     path('create/', views.RentalCreateAPIView.as_view()),
     path('active/list/', views.ActiveRentalListAPIView.as_view()),
     path('noactive/list/', views.NoActiveRentalListAPIView.as_view()),
+    path('noactive/bad/list/', views.NoActiveBadRentalListAPIView.as_view()),
     path('retrieve/<int:pk>/', views.RentalRetrieveAPIView.as_view()),
     path('successfully_paid/', views.SuccessfullyPaidAPIView.as_view()),
     path('generate_pdf/', views.GeneratePDF.as_view()),

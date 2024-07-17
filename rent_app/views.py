@@ -127,7 +127,17 @@ class NoActiveRentalListAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=False)
+        return super().get_queryset().filter(is_active=False, bad_rental=False)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class NoActiveBadRentalListAPIView(generics.ListAPIView):
+    queryset = Rental.objects.all()
+    serializer_class = NoActiveRentalListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=False, bad_rental=True)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -180,6 +190,7 @@ class SuccessfullyPaidAPIView(APIView):
             payment_schedules = PaymentSchedule.active_objects.filter(rental=rental)
             if payment_schedules.count() == 0:
                 rental.is_active = False
+                rental.closing_date = timezone.now().date()
                 rental.save()
                 car = rental.car
                 if rental.rent_type != 'credit':

@@ -45,14 +45,18 @@ class CarListSerializer(serializers.ModelSerializer):
     employee = EmployeeSerializer(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
+    days = serializers.SerializerMethodField('days_in_current')
 
     class Meta:
         model = Car
         fields = ['id', 'employee', 'name', 'car_number', 'car_year', 'information', 'tech_passport_number',
-                  'fuel_type', 'status', 'created_at', 'updated_at']
+                  'fuel_type', 'days', 'status', 'created_at', 'updated_at']
         extra_kwargs = {
             'employee': {'write_only': True},
         }
+
+    def days_in_current(self, obj):
+        return obj.days_in_current_status()
 
 
 class CarDetailSerializer(serializers.ModelSerializer):
@@ -60,15 +64,19 @@ class CarDetailSerializer(serializers.ModelSerializer):
     employee = EmployeeSerializer(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
+    days = serializers.SerializerMethodField('days_in_current')
 
     class Meta:
         model = Car
         fields = ['id', 'employee', 'name', 'car_number', 'car_year', 'information', 'tech_passport_number',
-                  'tech_passport_image_front', 'tech_passport_image_back', 'fuel_type', 'status',
+                  'tech_passport_image_front', 'tech_passport_image_back', 'fuel_type', 'days', 'status',
                   'created_at', 'updated_at']
         extra_kwargs = {
             'employee': {'write_only': True},
         }
+
+    def days_in_current(self, obj):
+        return obj.days_in_current_status()
 
 
 class CarUpdateSerializer(serializers.ModelSerializer):

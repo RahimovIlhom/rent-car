@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
+from django.utils.timezone import now
 
 employee_model = get_user_model()
 
@@ -64,6 +65,12 @@ class Car(models.Model):
     class Meta:
         db_table = 'cars'
         ordering = ['-created_at']
+
+    def days_since_last_update(self):
+        return (now() - self.updated_at).days
+
+    def days_in_current_status(self):
+        return self.days_since_last_update()
 
 
 class CarImage(models.Model):

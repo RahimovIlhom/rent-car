@@ -56,19 +56,13 @@ class PaymentScheduleDashboardView(generics.ListAPIView):
 
     def get_queryset(self):
         rent_type = self.request.query_params.get('rent_type', 'daily')
-        today = timezone.localdate()
 
         if rent_type == 'daily':
-            end_date = today + timedelta(days=3)
             return PaymentSchedule.active_objects.filter(
-                payment_date__range=(today, end_date),
                 rental__rent_type=rent_type
             )
         elif rent_type in ['monthly', 'credit']:
-            start_date = today.replace(day=1)
-            end_date = start_date + relativedelta(months=3)
             return PaymentSchedule.active_objects.filter(
-                payment_date__range=(start_date, end_date),
                 rental__rent_type=rent_type
             )
         else:
@@ -80,11 +74,10 @@ class PaymentScheduleDashboardView(generics.ListAPIView):
         today = timezone.localdate()
         data = []
 
-        now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        filtered_schedules = queryset.filter(due_date__lte=now)
+        filtered_schedules = queryset.filter(payment_date__lt=today)
         data.append({
             'date': 'unpaid',
-            'payment_schedules': PaymentScheduleListSerializer(filtered_schedules, many=True).data
+            'payment_schedules': PaymentScheduleListSerializer(filtered_schedules.order_by('-due_date'), many=True).data
         })
 
         if rent_type == 'daily':
@@ -161,6 +154,7 @@ class RentalRetrieveAPIView(generics.RetrieveAPIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SuccessfullyPaidAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter(
@@ -179,6 +173,7 @@ class SuccessfullyPaidAPIView(APIView):
             payment.is_paid = True
             amount = payment.get_total_amount()
             payment.make_payment(amount)
+            payment.employee = request.user
             payment.save()
 
             rental = payment.rental

@@ -29,6 +29,7 @@ class ActiveRentalManager(models.Manager):
 
 
 class PaymentSchedule(models.Model):
+    employee = models.ForeignKey(employee_model, on_delete=models.SET_NULL, null=True, related_name='payment_schedules')
     rental = models.ForeignKey('Rental', on_delete=models.CASCADE, related_name='payment_schedule')
     due_date = models.DateTimeField()
     payment_date = models.DateField()
@@ -61,13 +62,13 @@ class PaymentSchedule(models.Model):
         penalty = Decimal('0.0')
 
         if self.rental.rent_type != 'credit' and overdue_time.total_seconds() > 0:
-            penalty_rate = self.rental.penalty_percentage / Decimal('100.0')
+            penalty_rate = self.rental.penalty_amount
             if self.rental.rent_type == 'monthly':
-                overdue_days = overdue_time.days
-                penalty = self.amount * penalty_rate * overdue_days
+                overdue_days = (current_date.date() - self.payment_date).days
+                penalty = penalty_rate * overdue_days
             elif self.rental.rent_type == 'daily':
                 overdue_hours = overdue_time.total_seconds() // 3600
-                penalty = self.amount * penalty_rate * overdue_hours
+                penalty = penalty_rate * overdue_hours
 
         total_payment = self.amount + penalty
         self.penalty_amount = penalty
@@ -104,13 +105,13 @@ class PaymentSchedule(models.Model):
         penalty = Decimal('0.0')
 
         if self.rental.rent_type != 'credit' and overdue_time.total_seconds() > 0:
-            penalty_rate = self.rental.penalty_percentage / Decimal('100.0')
+            penalty_rate = self.rental.penalty_amount
             if self.rental.rent_type == 'monthly':
-                overdue_days = overdue_time.days
-                penalty = self.amount * penalty_rate * overdue_days
+                overdue_days = (current_date.date() - self.payment_date).days
+                penalty = penalty_rate * overdue_days
             elif self.rental.rent_type == 'daily':
                 overdue_hours = overdue_time.total_seconds() // 3600
-                penalty = self.amount * penalty_rate * overdue_hours
+                penalty = penalty_rate * overdue_hours
 
         return Decimal(penalty)
 
@@ -121,6 +122,12 @@ class PaymentSchedule(models.Model):
         """
         total_amount = self.amount + self.get_percentage_amount() - self.amount_paid
         return Decimal(total_amount)
+
+
+CURRENCIES = (
+    ('uzs', 'UZS'),
+    ('usd', 'USD'),
+)
 
 
 class Rental(models.Model):
@@ -149,14 +156,14 @@ class Rental(models.Model):
                                               ['jpg', 'png', 'HEIC', 'jpeg', 'gif', 'bmp', 'tiff', 'webp'],
                                           )]
                                       )
+    currency = models.CharField(max_length=3, choices=CURRENCIES, default='UZS')
     rent_type = models.CharField(max_length=20, choices=RENT_TYPES, default='daily')
     rent_amount = models.DecimalField(max_digits=11, decimal_places=2, validators=[MinValueValidator(Decimal('0.0'))])
     rent_period = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     initial_payment_amount = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
                                                  validators=[MinValueValidator(Decimal('0.0'))])
-    penalty_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.0'),
-                                             validators=[MinValueValidator(Decimal('0.0')),
-                                                         MaxValueValidator(Decimal('100.0'))])
+    penalty_amount = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
+                                         validators=[MinValueValidator(Decimal('0.0')), ])
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=False, blank=True)
     closing_date = models.DateField(null=True, blank=True)

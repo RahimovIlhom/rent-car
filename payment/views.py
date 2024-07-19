@@ -19,8 +19,8 @@ class PaymentCreateAPIView(generics.CreateAPIView):
 
 class RentalPaymentsListAPIView(generics.ListAPIView):
     serializer_class = RentalPaymentsListSerializer
-    queryset = Payment.objects.all()
     permission_classes = [IsAuthenticated]
+    filter_backends = []
 
     def get_queryset(self):
         rental_id = self.kwargs.get('rental_id')

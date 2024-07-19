@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
 from django.http import HttpResponse
@@ -11,6 +13,7 @@ from datetime import date, timedelta
 from rest_framework import generics, permissions, parsers
 from rest_framework.views import APIView
 
+from car_app.models import Car
 from rent_app.models import PaymentSchedule, Rental
 from rent_app.serializers import PaymentScheduleDashboardSerializer, PaymentScheduleListSerializer, \
     CreateRentalSerializer, ActiveRentalListSerializer, RentalRetrieveSerializer, NoActiveRentalListSerializer
@@ -231,6 +234,86 @@ class GeneratePDF(APIView):
             response = HttpResponse(pdf, content_type='application/pdf')
             response['Content-Disposition'] = f'attachment; filename="rent-{rental.id}.pdf"'
             return response
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class BlacklistNoActiveRentalAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'rental_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Ijara ID')
+            },
+            required=['rental_id']
+        ),
+        responses={
+            200: openapi.Response(description='Ijara qora ro\'yxatga tushurildi'),
+            400: openapi.Response(description='Ijara ID kerak'),
+            404: openapi.Response(description='Ijara topilmadi')
+        }
+    )
+    def post(self, request):
+        rental_id = request.data.get('rental_id')
+        if rental_id is None:
+            return Response(data={'detail': 'Ijara ID kerak'}, status=400)
+        try:
+            rental = Rental.objects.get(id=rental_id, is_active=False, bad_rental=False)
+        except Rental.DoesNotExist:
+            return Response(data={'detail': 'Ijara topilmadi'}, status=404)
+        rental.bad_rental = True
+        rental.save()
+        return Response(data={'message': 'Ijara qora ro\'yxatga tushurildi'}, status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ClosingActiveRentalAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'rental_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Ijara ID')
+            },
+            required=['rental_id']
+        ),
+        responses={
+            200: openapi.Response(description='Ijara yopildi'),
+            400: openapi.Response(description='Ijara ID kerak'),
+            404: openapi.Response(description='Ijara topilmadi')
+        }
+    )
+    def post(self, request):
+        rental_id = request.data.get('rental_id')
+        if rental_id is None:
+            return Response(data={'detail': 'Ijara ID kerak'}, status=400)
+        try:
+            rental = Rental.active_objects.get(id=rental_id)
+        except Rental.DoesNotExist:
+            return Response(data={'detail': 'Ijara topilmadi'}, status=404)
+
+        rental.is_active = False
+        rental.closing_date = timezone.now().date()
+        rental.save()
+        payment_schedules = PaymentSchedule.active_objects.filter(rental=rental)
+        for payment in payment_schedules:
+            payment.is_paid = True
+            payment.amount = payment.amount_paid
+            payment.penalty_amount = Decimal('0.0')
+            payment.paid_date = timezone.now()
+            payment.payment_closing_date = timezone.now()
+            payment.save()
+        if rental.rent_type == 'credit':
+            car = rental.car
+            car.status = 'sold'
+            car.is_active = False
+        else:
+            car = rental.car
+            car.status = 'active'
+        car.save()
+        return Response(data={'message': 'Ijara yopildi'}, status=200)
 
 
 # @method_decorator(csrf_exempt, name='dispatch')

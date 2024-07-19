@@ -242,3 +242,10 @@ class Rental(models.Model):
         for payment_schedule in payment_schedules:
             total_amount += payment_schedule.amount_paid
         return total_amount
+
+    def get_amount(self):
+        payment_schedules = PaymentSchedule.objects.filter(rental=self)
+        total_amount = Decimal('0.0')
+        for payment_schedule in payment_schedules:
+            total_amount += payment_schedule.amount
+        return total_amount

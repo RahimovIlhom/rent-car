@@ -83,6 +83,7 @@ class NoActiveRentalListSerializer(serializers.ModelSerializer):
 
 
 class CreateRentalSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     car_id = serializers.IntegerField(write_only=True)
     RENT_TYPE_CHOICES = [
         ('daily', 'Daily'),
@@ -95,16 +96,15 @@ class CreateRentalSerializer(serializers.ModelSerializer):
     rent_period = serializers.IntegerField(validators=[MinValueValidator(1)])
     initial_payment_amount = serializers.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
                                                       validators=[MinValueValidator(Decimal('0.0'))])
-    penalty_amount = serializers.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.0'),
-                                                  validators=[MinValueValidator(Decimal('0.0')),
-                                                              MaxValueValidator(Decimal('100.0'))])
+    penalty_amount = serializers.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
+                                              validators=[MinValueValidator(Decimal('0.0'))])
     passport_image_front = serializers.ImageField(required=False, allow_null=True)
     passport_image_back = serializers.ImageField(required=False, allow_null=True)
     receipt_image = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Rental
-        fields = ['car_id', 'fullname', 'phone', 'passport', 'passport_image_front', 'passport_image_back',
+        fields = ['id', 'car_id', 'fullname', 'phone', 'passport', 'passport_image_front', 'passport_image_back',
                   'receipt_image', 'rent_type', 'currency', 'rent_amount', 'rent_period', 'initial_payment_amount',
                   'penalty_amount']
 
@@ -158,7 +158,7 @@ class RentalRetrieveSerializer(serializers.ModelSerializer):
         return PaymentScheduleListForRentalSerializer(obj.payment_schedule.all(), many=True).data
 
     def get_amount(self, obj) -> Decimal:
-        return obj.rent_amount * obj.rent_period
+        return obj.get_amount()
 
     def get_total_amount(self, obj) -> Decimal:
         return obj.get_total_amount()

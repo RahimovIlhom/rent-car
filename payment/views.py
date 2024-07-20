@@ -30,7 +30,7 @@ class RentalPaymentsListAPIView(generics.ListAPIView):
             rental = Rental.objects.get(pk=rental_id)
         except Rental.DoesNotExist:
             raise NotFound("Ijara shartnomasi topilmadi")
-        return Payment.objects.filter(rental=rental)
+        return Payment.objects.filter(rental=rental).order_by('created_at')
 
     @swagger_auto_schema(
         manual_parameters=[

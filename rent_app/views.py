@@ -325,6 +325,9 @@ class ClosingActiveRentalAPIView(APIView):
         except Rental.DoesNotExist:
             return Response(data={'detail': 'Ijara topilmadi'}, status=404)
 
+        if rental.rent_type == 'credit':
+            return Response(data={'detail': 'Nasiya savdoda ijara yopilmaydi'}, status=400)
+
         rental.is_active = False
         rental.closing_date = timezone.now().date()
         rental.save()

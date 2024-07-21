@@ -222,12 +222,17 @@ class Rental(models.Model):
             current_date = due_date
 
     def create_payment_day_schedule(self):
-        PaymentSchedule.objects.create(
-            rental=self,
-            due_date=self.end_date,
-            payment_date=self.end_date.date(),
-            amount=self.rent_amount * self.rent_period
-        )
+        rent_hour = self.start_date.hour
+        current_date = self.start_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
+        for _ in range(self.rent_period):
+            due_date = current_date + relativedelta(days=1)
+            PaymentSchedule.objects.create(
+                rental=self,
+                due_date=due_date,
+                payment_date=due_date.date(),
+                amount=self.rent_amount
+            )
+            current_date = due_date
 
     def get_total_amount(self):
         payment_schedules = PaymentSchedule.objects.filter(rental=self)

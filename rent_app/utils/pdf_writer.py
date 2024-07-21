@@ -72,10 +72,10 @@ def pdf_writer(data):
         ("Zalok", format_currency(data['initial_payment_amount'])),
         ("Boshlanish sanasi", data['start_date']),
         ("Tugash sanasi", data['end_date']),
-        ("Umumiy miqdor", format_currency(data['amount'])),
-        ("Umumiy jarima", format_currency(data['total_penalty_amount'])),
-        ("Umumiy to'langan miqdor", format_currency(data['total_paid_amount'])),
-        ("Umumiy qarzdorlik", format_currency(data['total_amount'])),
+        ("Umumiy miqdor", f"{format_currency(data['amount'])} {data['currency']}"),
+        ("Umumiy jarima", f"{format_currency(data['total_penalty_amount'])} {data['currency']}"),
+        ("Umumiy to'langan miqdor", f"{format_currency(data['total_paid_amount'])} {data['currency']}"),
+        ("Umumiy qarzdorlik", f"{format_currency(data['total_amount'])} {data['currency']}"),
         ("Holat", "Ijara faol" if data['is_active'] else "Ijara yopilgan"),
     ]
 
@@ -117,10 +117,10 @@ def pdf_writer(data):
     payment_schedule_data.append([
         "",
         "Umumiy",
-        format_currency(data['amount']),
-        format_currency(data['total_penalty_amount']),
-        format_currency(data['total_paid_amount']),
-        f"Qarzdorlik: {format_currency(data['total_amount'])}",
+        f"{format_currency(data['amount'])} {data['currency']}",
+        f"{format_currency(data['total_penalty_amount'])} {data['currency']}",
+        f"{format_currency(data['total_paid_amount'])} {data['currency']}",
+        f"Qarzdorlik: {format_currency(data['total_amount'])} {data['currency']}",
         ""
     ])
 

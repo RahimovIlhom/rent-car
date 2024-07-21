@@ -45,9 +45,9 @@ INSTALLED_APPS = [
     'payment',
 ]
 
-CRONJOBS = [
-    ('0 8 * * *', 'rent_app.management.commands.send_payment_reminders')
-]
+# CRONJOBS = [
+#     ('0 8 * * *', 'rent_app.management.commands.send_payment_reminders')
+# ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -133,8 +133,8 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'config.wsgi.application'
-#
+WSGI_APPLICATION = 'config.wsgi.application'
+
 # ASGI_APPLICATION = 'config.asgi.application'
 #
 # CHANNEL_LAYERS = {
@@ -146,9 +146,9 @@ TEMPLATES = [
 #     },
 # }
 
-TWILIO_ACCOUNT_SID = env.str('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = env.str('TWILIO_AUTH_TOKEN')
-TWILIO_PHONE_NUMBER = env.str('TWILIO_PHONE_NUMBER')
+# TWILIO_ACCOUNT_SID = env.str('TWILIO_ACCOUNT_SID')
+# TWILIO_AUTH_TOKEN = env.str('TWILIO_AUTH_TOKEN')
+# TWILIO_PHONE_NUMBER = env.str('TWILIO_PHONE_NUMBER')
 
 
 # DATABASES = {

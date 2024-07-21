@@ -72,14 +72,18 @@ class NoActiveRentalListSerializer(serializers.ModelSerializer):
     car = DashboardCarSerializer(read_only=True)
     total_paid_amount = serializers.SerializerMethodField('get_total_paid_amount')
     employee = EmployeeSerializer(read_only=True)
+    block_rental = serializers.SerializerMethodField('get_block_rental')
 
     class Meta:
         model = Rental
         fields = ['id', 'employee', 'fullname', 'phone', 'start_date', 'end_date', 'closing_date', 'rent_type',
-                  'currency', 'total_paid_amount', 'car']
+                  'currency', 'total_paid_amount', 'car', 'block_rental']
 
     def get_total_paid_amount(self, obj) -> Decimal:
         return obj.get_total_paid_amount()
+
+    def get_block_rental(self, obj):
+        return obj.block_rental
 
 
 class CreateRentalSerializer(serializers.ModelSerializer):

@@ -30,10 +30,14 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
 class RentalPaymentsListSerializer(serializers.ModelSerializer):
     employee = EmployeeSerializer(read_only=True)
     rental = RentalDashboardSerializer(read_only=True)
+    currency = serializers.SerializerMethodField('get_currency')
 
     class Meta:
         model = Payment
-        fields = ['id', 'employee', 'rental', 'amount', 'created_at']
+        fields = ['id', 'employee', 'rental', 'amount', 'currency', 'created_at']
+
+    def get_currency(self, obj):
+        return obj.rental.currency
 
 
 class PaymentsListSerializer(serializers.ModelSerializer):

@@ -82,8 +82,8 @@ class NoActiveRentalListSerializer(serializers.ModelSerializer):
     def get_total_paid_amount(self, obj) -> Decimal:
         return obj.get_total_paid_amount()
 
-    def get_block_rental(self, obj):
-        return obj.block_rental
+    def get_block_rental(self, obj) -> bool:
+        return obj.bad_rental
 
 
 class CreateRentalSerializer(serializers.ModelSerializer):

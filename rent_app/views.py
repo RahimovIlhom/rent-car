@@ -268,6 +268,37 @@ class BlacklistNoActiveRentalAPIView(APIView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
+class UnBlocklistingRentalAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'rental_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Ijara ID')
+            },
+            required=['rental_id']
+        ),
+        responses={
+            200: openapi.Response(description='Ijara qora ro\'yxatdan chiqarildi'),
+            400: openapi.Response(description='Ijara ID kerak'),
+            404: openapi.Response(description='Ijara topilmadi')
+        }
+    )
+    def post(self, request):
+        rental_id = request.data.get('rental_id')
+        if rental_id is None:
+            return Response(data={'detail': 'Ijara ID kerak'}, status=400)
+        try:
+            rental = Rental.objects.get(id=rental_id, is_active=False, bad_rental=True)
+        except Rental.DoesNotExist:
+            return Response(data={'detail': 'Ijara topilmadi'}, status=404)
+        rental.bad_rental = False
+        rental.save()
+        return Response(data={'message': 'Ijara qora ro\'yxatdan chiqarildi'}, status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class ClosingActiveRentalAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

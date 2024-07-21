@@ -10,6 +10,7 @@ urlpatterns = [
     path('active/rental/closing/', views.ClosingActiveRentalAPIView.as_view()),
     path('noactive/list/', views.NoActiveRentalListAPIView.as_view()),
     path('noactive/rental/blacklisting/', views.BlacklistNoActiveRentalAPIView.as_view()),
+    path('noactive/rental/unblacklisting/', views.UnBlocklistingRentalAPIView.as_view()),
     path('noactive/blacklisted/list/', views.NoActiveBadRentalListAPIView.as_view()),
     path('retrieve/<int:pk>/', views.RentalRetrieveAPIView.as_view()),
     path('successfully_paid/', views.SuccessfullyPaidAPIView.as_view()),

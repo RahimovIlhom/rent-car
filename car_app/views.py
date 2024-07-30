@@ -38,8 +38,8 @@ class CarCreateAPIView(APIView):
         responses={201: CarCreateSerializer, 400: 'Bad Request'}
     )
     def post(self, request):
-        car_year = request.data.get('car_year')
-        if Car.objects.filter(car_year=car_year).exists():
+        car_number = request.data.get('car_number')
+        if Car.objects.filter(car_number=car_number).exists():
             return Response(data={'detail': 'Bunday raqamli mashina mavjud'}, status=400)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -98,6 +98,7 @@ class CreateRentalSerializer(serializers.ModelSerializer):
     rent_amount = serializers.DecimalField(max_digits=11, decimal_places=2, required=True,
                                            validators=[MinValueValidator(Decimal('0.0'))])
     rent_period = serializers.IntegerField(validators=[MinValueValidator(1)])
+    payment_date = serializers.DateField(required=False)
     initial_payment_amount = serializers.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
                                                       validators=[MinValueValidator(Decimal('0.0'))])
     penalty_amount = serializers.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
@@ -109,8 +110,8 @@ class CreateRentalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rental
         fields = ['id', 'car_id', 'fullname', 'phone', 'passport', 'passport_image_front', 'passport_image_back',
-                  'receipt_image', 'rent_type', 'currency', 'rent_amount', 'rent_period', 'initial_payment_amount',
-                  'penalty_amount']
+                  'receipt_image', 'rent_type', 'currency', 'rent_amount', 'rent_period', 'payment_date',
+                  'initial_payment_amount', 'penalty_amount']
 
     def create(self, validated_data):
         car_id = validated_data.pop('car_id')

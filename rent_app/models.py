@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
@@ -168,6 +168,7 @@ class Rental(models.Model):
     penalty_amount = models.DecimalField(max_digits=11, decimal_places=2, default=Decimal('0.0'),
                                          validators=[MinValueValidator(Decimal('0.0')), ])
     start_date = models.DateTimeField(auto_now_add=True)
+    payment_date = models.DateField(null=True, blank=True)
     end_date = models.DateTimeField(null=False, blank=True)
     closing_date = models.DateField(null=True, blank=True)
     bad_rental = models.BooleanField(default=False)
@@ -209,17 +210,23 @@ class Rental(models.Model):
                 self.create_payment_schedule()
 
     def create_payment_schedule(self):
-        rent_hour = self.start_date.hour
-        current_date = self.start_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
+        if self.rent_type == 'credit' and self.payment_date:
+            rent_hour = self.start_date.hour
+            naive_current_date = datetime(self.payment_date.year, self.payment_date.month, self.payment_date.day,
+                                          rent_hour + 1, 0, 0)
+            current_date = timezone.make_aware(naive_current_date, timezone.get_current_timezone())
+        else:
+            rent_hour = self.start_date.hour
+            current_date = self.start_date.replace(hour=rent_hour + 1, minute=0, second=0, microsecond=0)
+
         for _ in range(self.rent_period):
-            due_date = current_date + relativedelta(months=1)
             PaymentSchedule.objects.create(
                 rental=self,
-                due_date=due_date,
-                payment_date=due_date.date(),
+                due_date=current_date,
+                payment_date=current_date.date(),
                 amount=self.rent_amount
             )
-            current_date = due_date
+            current_date = current_date + relativedelta(months=1)
 
     def create_payment_day_schedule(self):
         rent_hour = self.start_date.hour
